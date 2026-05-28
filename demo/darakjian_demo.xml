@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ════════════════════════════════════════════════════════════════
+             CLIENT PARTNERS
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="demo_partner_romero" model="res.partner">
+            <field name="name">Mariana Romero</field>
+            <field name="email">mariana.romero@example.com</field>
+            <field name="phone">+1 248 555 0142</field>
+            <field name="is_company" eval="False"/>
+            <field name="street">123 Main St</field>
+            <field name="city">Birmingham</field>
+            <field name="state_id" ref="base.state_us_22"/>
+            <field name="zip">48009</field>
+            <field name="country_id" ref="base.us"/>
+        </record>
+
+        <record id="demo_partner_romero_spouse" model="res.partner">
+            <field name="name">Diego Romero</field>
+            <field name="email">diego.romero@example.com</field>
+            <field name="phone">+1 248 555 0143</field>
+            <field name="is_company" eval="False"/>
+            <field name="parent_id" ref="demo_partner_romero"/>
+        </record>
+
+        <record id="demo_partner_sosa" model="res.partner">
+            <field name="name">Patricia Sosa</field>
+            <field name="email">patricia.sosa@example.com</field>
+            <field name="phone">+1 248 555 0188</field>
+            <field name="is_company" eval="False"/>
+        </record>
+
+        <record id="demo_partner_mendieta" model="res.partner">
+            <field name="name">Lorenzo Mendieta</field>
+            <field name="email">lorenzo.mendieta@example.com</field>
+            <field name="phone">+1 248 555 0211</field>
+            <field name="is_company" eval="False"/>
+        </record>
+
+        <record id="demo_partner_cordero" model="res.partner">
+            <field name="name">Esteban Cordero</field>
+            <field name="email">esteban.cordero@example.com</field>
+            <field name="phone">+1 248 555 0277</field>
+            <field name="is_company" eval="False"/>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             FAMILIES
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="demo_family_romero" model="darakjian.family">
+            <field name="name">The Romero family</field>
+            <field name="notes">&lt;p&gt;Long-time clients of the showroom. Two anniversaries celebrated with us so far.&lt;/p&gt;</field>
+        </record>
+
+        <record id="demo_family_member_mariana" model="darakjian.family.member">
+            <field name="family_id" ref="demo_family_romero"/>
+            <field name="partner_id" ref="demo_partner_romero"/>
+            <field name="role">spouse</field>
+            <field name="is_primary_contact" eval="True"/>
+        </record>
+
+        <record id="demo_family_member_diego" model="darakjian.family.member">
+            <field name="family_id" ref="demo_family_romero"/>
+            <field name="partner_id" ref="demo_partner_romero_spouse"/>
+            <field name="role">spouse</field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             SALESPERSON ASSIGNMENTS — admin as the titular advisor
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="demo_assignment_romero" model="darakjian.salesperson.assignment">
+            <field name="partner_id" ref="demo_partner_romero"/>
+            <field name="user_id" ref="base.user_admin"/>
+            <field name="date_from" eval="(DateTime.today() - relativedelta(months=6)).strftime('%Y-%m-%d')"/>
+            <field name="reason">Initial assignment after first bridal consult.</field>
+        </record>
+
+        <record id="demo_assignment_sosa" model="darakjian.salesperson.assignment">
+            <field name="partner_id" ref="demo_partner_sosa"/>
+            <field name="user_id" ref="base.user_admin"/>
+            <field name="date_from" eval="(DateTime.today() - relativedelta(months=3)).strftime('%Y-%m-%d')"/>
+        </record>
+
+        <record id="demo_assignment_mendieta" model="darakjian.salesperson.assignment">
+            <field name="partner_id" ref="demo_partner_mendieta"/>
+            <field name="user_id" ref="base.user_admin"/>
+            <field name="date_from" eval="(DateTime.today() - relativedelta(months=1)).strftime('%Y-%m-%d')"/>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             COMMISSION RULE — for admin (acts as advisor in demo)
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="demo_commission_rule_admin" model="darakjian.commission.rule">
+            <field name="name">Demo — 10% on confirmed orders</field>
+            <field name="user_id" ref="base.user_admin"/>
+            <field name="percentage">10.0</field>
+            <field name="min_margin">0.0</field>
+            <field name="valid_from" eval="(DateTime.today() - relativedelta(years=1)).strftime('%Y-%m-%d')"/>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             PRODUCTS — unique-piece jewelry
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="demo_product_diamond_solitaire" model="product.template">
+            <field name="name">Solitaire ring — 1.20 ct round brilliant</field>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">14500.00</field>
+            <field name="default_code">JEW-RING-001</field>
+        </record>
+
+        <record id="demo_product_diamond_necklace" model="product.template">
+            <field name="name">Diamond necklace — 2.10 ct pear</field>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">42000.00</field>
+            <field name="default_code">JEW-NECK-002</field>
+        </record>
+
+        <record id="demo_product_diamond_earrings" model="product.template">
+            <field name="name">Diamond stud earrings — 0.80 ct round</field>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">6800.00</field>
+            <field name="default_code">JEW-EARS-003</field>
+        </record>
+
+        <record id="demo_product_watch" model="product.template">
+            <field name="name">Vintage watch — pre-owned 18k</field>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">18500.00</field>
+            <field name="default_code">JEW-WTCH-004</field>
+        </record>
+
+        <record id="demo_product_bracelet" model="product.template">
+            <field name="name">Tennis bracelet — 5.00 ct total</field>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">22000.00</field>
+            <field name="default_code">JEW-BRAC-005</field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             GEM CARDS — enriched product profiles
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="demo_gem_card_solitaire" model="darakjian.gem.card">
+            <field name="product_id"
+                   eval="ref('demo_product_diamond_solitaire')
+                         and env['product.product'].search([('product_tmpl_id','=',ref('demo_product_diamond_solitaire'))],limit=1).id"/>
+            <field name="kind">diamond</field>
+            <field name="gia_report_number">2418596743</field>
+            <field name="four_cs_carat">1.20</field>
+            <field name="four_cs_color">F</field>
+            <field name="four_cs_clarity">VS1</field>
+            <field name="four_cs_cut">excellent</field>
+            <field name="rapaport_source">mock</field>
+        </record>
+
+        <record id="demo_gem_card_necklace" model="darakjian.gem.card">
+            <field name="product_id"
+                   eval="ref('demo_product_diamond_necklace')
+                         and env['product.product'].search([('product_tmpl_id','=',ref('demo_product_diamond_necklace'))],limit=1).id"/>
+            <field name="kind">diamond</field>
+            <field name="gia_report_number">5217446832</field>
+            <field name="four_cs_carat">2.10</field>
+            <field name="four_cs_color">D</field>
+            <field name="four_cs_clarity">IF</field>
+            <field name="four_cs_cut">excellent</field>
+            <field name="rapaport_source">mock</field>
+        </record>
+
+        <record id="demo_gem_card_earrings" model="darakjian.gem.card">
+            <field name="product_id"
+                   eval="ref('demo_product_diamond_earrings')
+                         and env['product.product'].search([('product_tmpl_id','=',ref('demo_product_diamond_earrings'))],limit=1).id"/>
+            <field name="kind">diamond</field>
+            <field name="four_cs_carat">0.80</field>
+            <field name="four_cs_color">H</field>
+            <field name="four_cs_clarity">SI1</field>
+            <field name="four_cs_cut">very_good</field>
+            <field name="rapaport_source">mock</field>
+        </record>
+
+        <record id="demo_gem_card_watch" model="darakjian.gem.card">
+            <field name="product_id"
+                   eval="ref('demo_product_watch')
+                         and env['product.product'].search([('product_tmpl_id','=',ref('demo_product_watch'))],limit=1).id"/>
+            <field name="kind">watch</field>
+        </record>
+
+        <!-- Refresh Rapaport prices on the gem cards we just loaded -->
+        <function model="darakjian.gem.card"
+                  name="_cron_refresh_rapaport_prices"/>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             WISHLISTS
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="demo_wishlist_romero" model="darakjian.wishlist">
+            <field name="partner_id" ref="demo_partner_romero"/>
+            <field name="salesperson_id" ref="base.user_admin"/>
+            <field name="source">showroom</field>
+            <field name="state">active</field>
+            <field name="notes">&lt;p&gt;She mentioned an anniversary in October — keeping an eye on pear-cut pieces above 2 ct.&lt;/p&gt;</field>
+        </record>
+
+        <record id="demo_wishlist_line_romero_necklace" model="darakjian.wishlist.line">
+            <field name="wishlist_id" ref="demo_wishlist_romero"/>
+            <field name="product_id"
+                   eval="env['product.product'].search([('product_tmpl_id','=',ref('demo_product_diamond_necklace'))],limit=1).id"/>
+            <field name="priority">2</field>
+            <field name="notes">First choice if she can stretch the budget.</field>
+        </record>
+
+        <record id="demo_wishlist_mendieta" model="darakjian.wishlist">
+            <field name="partner_id" ref="demo_partner_mendieta"/>
+            <field name="salesperson_id" ref="base.user_admin"/>
+            <field name="source">advisor</field>
+            <field name="state">active</field>
+        </record>
+
+        <record id="demo_wishlist_line_mendieta_watch" model="darakjian.wishlist.line">
+            <field name="wishlist_id" ref="demo_wishlist_mendieta"/>
+            <field name="product_id"
+                   eval="env['product.product'].search([('product_tmpl_id','=',ref('demo_product_watch'))],limit=1).id"/>
+            <field name="priority">1</field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             ACTIVE HOLDS
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="demo_hold_romero_solitaire" model="darakjian.hold">
+            <field name="product_id"
+                   eval="env['product.product'].search([('product_tmpl_id','=',ref('demo_product_diamond_solitaire'))],limit=1).id"/>
+            <field name="partner_id" ref="demo_partner_romero"/>
+            <field name="salesperson_id" ref="base.user_admin"/>
+            <field name="date_start" eval="(DateTime.today() - relativedelta(days=3)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="date_expires" eval="(DateTime.today() + relativedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="notes">Engagement ring — waiting on financing approval.</field>
+        </record>
+
+        <record id="demo_hold_sosa_bracelet" model="darakjian.hold">
+            <field name="product_id"
+                   eval="env['product.product'].search([('product_tmpl_id','=',ref('demo_product_bracelet'))],limit=1).id"/>
+            <field name="partner_id" ref="demo_partner_sosa"/>
+            <field name="salesperson_id" ref="base.user_admin"/>
+            <field name="date_start" eval="(DateTime.today() - relativedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="date_expires" eval="(DateTime.today() + relativedelta(days=1, hours=12)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="notes">Birthday gift — pickup confirmed for Saturday.</field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             APPOINTMENTS
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="demo_appointment_romero_upcoming" model="darakjian.appointment">
+            <field name="partner_id" ref="demo_partner_romero"/>
+            <field name="salesperson_id" ref="base.user_admin"/>
+            <field name="datetime_start" eval="(DateTime.today() + relativedelta(days=2, hours=10)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="datetime_end" eval="(DateTime.today() + relativedelta(days=2, hours=11)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="kind">scheduled</field>
+            <field name="state">draft</field>
+            <field name="wishlist_id" ref="demo_wishlist_romero"/>
+            <field name="notes_internal">&lt;p&gt;She'll bring her husband. Have the necklace and the solitaire ready.&lt;/p&gt;</field>
+        </record>
+
+        <record id="demo_appointment_mendieta_past" model="darakjian.appointment">
+            <field name="partner_id" ref="demo_partner_mendieta"/>
+            <field name="salesperson_id" ref="base.user_admin"/>
+            <field name="datetime_start" eval="(DateTime.today() - relativedelta(days=14, hours=4)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="datetime_end" eval="(DateTime.today() - relativedelta(days=14, hours=3)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="kind">watch_appointment</field>
+            <field name="state">done</field>
+            <field name="wishlist_id" ref="demo_wishlist_mendieta"/>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             SERVICE TICKETS — one in each visible state
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="demo_service_received" model="darakjian.service.ticket">
+            <field name="partner_id" ref="demo_partner_cordero"/>
+            <field name="piece_description">Vintage gold ring, ~5g, single round diamond</field>
+            <field name="kind">reparation</field>
+            <field name="description">Client asked to resize from US 7 to US 8.5 and polish the band.</field>
+            <field name="date_received" eval="(DateTime.today() - relativedelta(days=1)).strftime('%Y-%m-%d')"/>
+            <field name="date_promised" eval="(DateTime.today() + relativedelta(days=6)).strftime('%Y-%m-%d')"/>
+            <field name="custody_location">Safe A, drawer 3</field>
+            <field name="received_by" ref="base.user_admin"/>
+        </record>
+
+        <record id="demo_service_in_workshop" model="darakjian.service.ticket">
+            <field name="partner_id" ref="demo_partner_sosa"/>
+            <field name="piece_description">Pearl necklace, restringing</field>
+            <field name="kind">reparation</field>
+            <field name="date_received" eval="(DateTime.today() - relativedelta(days=5)).strftime('%Y-%m-%d')"/>
+            <field name="date_promised" eval="(DateTime.today() + relativedelta(days=2)).strftime('%Y-%m-%d')"/>
+            <field name="custody_location">Workshop bench 2</field>
+            <field name="state">in_workshop</field>
+            <field name="received_by" ref="base.user_admin"/>
+            <field name="assigned_to" ref="base.user_admin"/>
+        </record>
+
+        <record id="demo_service_ready" model="darakjian.service.ticket">
+            <field name="partner_id" ref="demo_partner_mendieta"/>
+            <field name="piece_description">Heritage cufflinks, appraisal report</field>
+            <field name="kind">appraisal</field>
+            <field name="date_received" eval="(DateTime.today() - relativedelta(days=10)).strftime('%Y-%m-%d')"/>
+            <field name="date_promised" eval="(DateTime.today() - relativedelta(days=1)).strftime('%Y-%m-%d')"/>
+            <field name="custody_location">Safe B, vault</field>
+            <field name="state">ready</field>
+            <field name="received_by" ref="base.user_admin"/>
+            <field name="assigned_to" ref="base.user_admin"/>
+        </record>
+
+        <record id="demo_service_delivered" model="darakjian.service.ticket">
+            <field name="partner_id" ref="demo_partner_romero_spouse"/>
+            <field name="piece_description">Wedding band, cleaning and inspection</field>
+            <field name="kind">custody</field>
+            <field name="date_received" eval="(DateTime.today() - relativedelta(days=20)).strftime('%Y-%m-%d')"/>
+            <field name="date_promised" eval="(DateTime.today() - relativedelta(days=15)).strftime('%Y-%m-%d')"/>
+            <field name="custody_location">Returned to client</field>
+            <field name="state">delivered</field>
+            <field name="received_by" ref="base.user_admin"/>
+        </record>
+
+    </data>
+</odoo>

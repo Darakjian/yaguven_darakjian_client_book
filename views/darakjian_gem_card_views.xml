@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             KANBAN — Editorial gem-card feed (tablet "post" style)
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="view_darakjian_gem_card_kanban" model="ir.ui.view">
+            <field name="name">darakjian.gem.card.kanban</field>
+            <field name="model">darakjian.gem.card</field>
+            <field name="arch" type="xml">
+                <kanban class="o_darakjian_post" default_order="create_date desc" sample="1">
+                    <field name="id"/>
+                    <field name="name"/>
+                    <field name="kind"/>
+                    <field name="product_id"/>
+                    <field name="gia_report_number"/>
+                    <field name="four_cs_carat"/>
+                    <field name="four_cs_color"/>
+                    <field name="four_cs_clarity"/>
+                    <field name="four_cs_cut"/>
+                    <field name="rapaport_price_ref"/>
+                    <field name="rapaport_source"/>
+                    <field name="rapaport_fetched_at"/>
+                    <field name="currency_id"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="o_kanban_record o_darakjian_post_card">
+                                <div class="o_dk_post_hero">
+                                    <img t-att-src="kanban_image('product.product', 'image_512', record.product_id.raw_value)"
+                                         alt="Piece" class="o_dk_post_hero_image"/>
+                                </div>
+                                <div class="o_dk_post_title">
+                                    <field name="product_id"/>
+                                </div>
+                                <div class="o_dk_post_subtitle">
+                                    <field name="kind"/>
+                                    <t t-if="record.gia_report_number.raw_value">
+                                        · GIA <field name="gia_report_number"/>
+                                    </t>
+                                </div>
+                                <div class="o_dk_post_body o_dk_4cs" t-if="record.kind.raw_value == 'diamond'">
+                                    <span class="o_dk_pill o_dk_pill_4cs"
+                                          t-if="record.four_cs_carat.raw_value">
+                                        <field name="four_cs_carat"/> ct
+                                    </span>
+                                    <span class="o_dk_pill o_dk_pill_4cs"
+                                          t-if="record.four_cs_color.raw_value">
+                                        <field name="four_cs_color"/>
+                                    </span>
+                                    <span class="o_dk_pill o_dk_pill_4cs"
+                                          t-if="record.four_cs_clarity.raw_value">
+                                        <field name="four_cs_clarity"/>
+                                    </span>
+                                    <span class="o_dk_pill o_dk_pill_4cs"
+                                          t-if="record.four_cs_cut.raw_value">
+                                        <field name="four_cs_cut"/>
+                                    </span>
+                                </div>
+                                <div class="o_dk_post_footer"
+                                     t-if="record.rapaport_price_ref.raw_value">
+                                    <span class="o_dk_price">
+                                        <field name="rapaport_price_ref" widget="monetary"/>
+                                    </span>
+                                    <span class="o_dk_price_meta">
+                                        <field name="rapaport_source"/>
+                                    </span>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             FORM — Editorial detail view
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="view_darakjian_gem_card_form" model="ir.ui.view">
+            <field name="name">darakjian.gem.card.form</field>
+            <field name="model">darakjian.gem.card</field>
+            <field name="arch" type="xml">
+                <form class="o_darakjian_post">
+                    <header>
+                        <button name="action_refresh_rapaport_price" type="object"
+                                string="Refresh Rapaport"
+                                class="oe_highlight"
+                                invisible="kind != 'diamond'"/>
+                        <button name="action_open_product" type="object"
+                                string="Open product"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                            <div class="o_dk_post_subtitle">
+                                <field name="kind"/>
+                            </div>
+                        </div>
+                        <group>
+                            <group string="Piece">
+                                <field name="product_id"
+                                       options="{'no_create_edit': True}"/>
+                                <field name="provenance_country_id"/>
+                            </group>
+                            <group string="Certification">
+                                <field name="gia_report_number"
+                                       invisible="kind not in ('diamond', 'colored_stone')"/>
+                                <field name="igi_report_number"
+                                       invisible="kind not in ('diamond', 'colored_stone')"/>
+                                <field name="certification_pdf"
+                                       filename="certification_pdf_filename"/>
+                                <field name="certification_pdf_filename" invisible="1"/>
+                            </group>
+                        </group>
+                        <group string="4Cs"
+                               invisible="kind not in ('diamond', 'colored_stone')">
+                            <group>
+                                <field name="four_cs_carat"/>
+                                <field name="four_cs_color"/>
+                            </group>
+                            <group>
+                                <field name="four_cs_clarity"/>
+                                <field name="four_cs_cut"/>
+                            </group>
+                        </group>
+                        <group string="Rapaport reference"
+                               invisible="kind != 'diamond'">
+                            <group>
+                                <field name="rapaport_source"/>
+                                <field name="rapaport_quote_id" readonly="1"/>
+                                <field name="rapaport_fetched_at" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="currency_id"
+                                       options="{'no_create': True, 'no_open': True}"/>
+                                <field name="rapaport_price_per_carat"
+                                       widget="monetary" readonly="1"/>
+                                <field name="rapaport_price_ref"
+                                       widget="monetary" readonly="1"/>
+                            </group>
+                        </group>
+                        <group string="Multimedia">
+                            <field name="video_url" widget="url"/>
+                            <field name="extra_photo_ids" widget="many2many_binary"/>
+                        </group>
+                        <group string="Internal notes">
+                            <field name="internal_notes" nolabel="1"
+                                   placeholder="Provenance story, hooks for the conversation, sourcing details..."/>
+                        </group>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             LIST — Fallback table for managers and bulk operations
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="view_darakjian_gem_card_list" model="ir.ui.view">
+            <field name="name">darakjian.gem.card.list</field>
+            <field name="model">darakjian.gem.card</field>
+            <field name="arch" type="xml">
+                <list default_order="create_date desc">
+                    <field name="product_id"/>
+                    <field name="kind"/>
+                    <field name="gia_report_number" optional="show"/>
+                    <field name="four_cs_carat" optional="show"/>
+                    <field name="four_cs_color" optional="show"/>
+                    <field name="four_cs_clarity" optional="show"/>
+                    <field name="four_cs_cut" optional="hide"/>
+                    <field name="rapaport_price_ref" widget="monetary" optional="show"/>
+                    <field name="currency_id" optional="hide"/>
+                    <field name="rapaport_source" optional="hide"/>
+                    <field name="rapaport_fetched_at" optional="hide"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             SEARCH — Filters tuned to gemological lookup
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="view_darakjian_gem_card_search" model="ir.ui.view">
+            <field name="name">darakjian.gem.card.search</field>
+            <field name="model">darakjian.gem.card</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="product_id"/>
+                    <field name="gia_report_number"/>
+                    <field name="igi_report_number"/>
+                    <field name="four_cs_color"/>
+                    <field name="four_cs_clarity"/>
+                    <filter name="filter_diamond" string="Diamonds"
+                            domain="[('kind', '=', 'diamond')]"/>
+                    <filter name="filter_colored_stone" string="Colored stones"
+                            domain="[('kind', '=', 'colored_stone')]"/>
+                    <filter name="filter_watch" string="Watches"
+                            domain="[('kind', '=', 'watch')]"/>
+                    <filter name="filter_jewelry" string="Jewelry pieces"
+                            domain="[('kind', '=', 'jewelry_piece')]"/>
+                    <separator/>
+                    <filter name="filter_with_gia" string="With GIA"
+                            domain="[('gia_report_number', '!=', False)]"/>
+                    <filter name="filter_with_certification" string="Certified (PDF)"
+                            domain="[('certification_pdf', '!=', False)]"/>
+                    <separator/>
+                    <filter name="filter_has_rapaport" string="With Rapaport ref"
+                            domain="[('rapaport_quote_id', '!=', False)]"/>
+                    <filter name="filter_missing_rapaport" string="Missing Rapaport ref"
+                            domain="[('kind', '=', 'diamond'), ('rapaport_quote_id', '=', False), ('four_cs_carat', '>', 0)]"/>
+                    <group expand="0" string="Group by">
+                        <filter name="groupby_kind" string="Kind"
+                                context="{'group_by': 'kind'}"/>
+                        <filter name="groupby_color" string="Color"
+                                context="{'group_by': 'four_cs_color'}"/>
+                        <filter name="groupby_clarity" string="Clarity"
+                                context="{'group_by': 'four_cs_clarity'}"/>
+                        <filter name="groupby_provenance" string="Provenance"
+                                context="{'group_by': 'provenance_country_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             WINDOW ACTION + MENU ITEM
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="action_darakjian_gem_card" model="ir.actions.act_window">
+            <field name="name">Gem Cards</field>
+            <field name="res_model">darakjian.gem.card</field>
+            <field name="view_mode">kanban,list,form</field>
+            <field name="search_view_id" ref="view_darakjian_gem_card_search"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">No gem cards yet.</p>
+                <p>Each gem card enriches a product with 4Cs, certification and a Rapaport reference price.</p>
+            </field>
+        </record>
+
+        <menuitem id="menu_darakjian_gem_card"
+                  name="Gem Cards"
+                  parent="menu_darakjian_process"
+                  action="action_darakjian_gem_card"
+                  sequence="30"
+                  groups="group_darakjian_advisor"/>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             RAPAPORT QUOTE — Admin-only matrix view
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="view_darakjian_rapaport_quote_list" model="ir.ui.view">
+            <field name="name">darakjian.rapaport.quote.list</field>
+            <field name="model">darakjian.rapaport.quote</field>
+            <field name="arch" type="xml">
+                <list default_order="source, valid_from desc, color, clarity, carat_min">
+                    <field name="source"/>
+                    <field name="valid_from"/>
+                    <field name="carat_min"/>
+                    <field name="carat_max"/>
+                    <field name="color"/>
+                    <field name="clarity"/>
+                    <field name="price_per_carat" widget="monetary"/>
+                    <field name="currency_id"/>
+                    <field name="valid_to" optional="show"/>
+                    <field name="active" optional="hide"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_darakjian_rapaport_quote_form" model="ir.ui.view">
+            <field name="name">darakjian.rapaport.quote.form</field>
+            <field name="model">darakjian.rapaport.quote</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1><field name="name" readonly="1"/></h1>
+                        </div>
+                        <group>
+                            <group string="Band">
+                                <field name="carat_min"/>
+                                <field name="carat_max"/>
+                                <field name="color"/>
+                                <field name="clarity"/>
+                            </group>
+                            <group string="Value">
+                                <field name="price_per_carat" widget="monetary"/>
+                                <field name="currency_id"
+                                       options="{'no_create': True, 'no_open': True}"/>
+                                <field name="source"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group string="Validity">
+                                <field name="valid_from"/>
+                                <field name="valid_to"/>
+                                <field name="active"/>
+                            </group>
+                            <group string="Scope">
+                                <field name="company_id"/>
+                            </group>
+                        </group>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_darakjian_rapaport_quote_search" model="ir.ui.view">
+            <field name="name">darakjian.rapaport.quote.search</field>
+            <field name="model">darakjian.rapaport.quote</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="color"/>
+                    <field name="clarity"/>
+                    <filter name="filter_mock" string="Mock"
+                            domain="[('source', '=', 'mock')]"/>
+                    <filter name="filter_live" string="Live"
+                            domain="[('source', '=', 'live')]"/>
+                    <separator/>
+                    <filter name="filter_current" string="Currently valid"
+                            domain="[('active', '=', True), '|', ('valid_to', '=', False), ('valid_to', '&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                    <group expand="0" string="Group by">
+                        <filter name="groupby_source" string="Source"
+                                context="{'group_by': 'source'}"/>
+                        <filter name="groupby_color" string="Color"
+                                context="{'group_by': 'color'}"/>
+                        <filter name="groupby_clarity" string="Clarity"
+                                context="{'group_by': 'clarity'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_darakjian_rapaport_quote" model="ir.actions.act_window">
+            <field name="name">Rapaport Matrix</field>
+            <field name="res_model">darakjian.rapaport.quote</field>
+            <field name="view_mode">list,form</field>
+            <field name="search_view_id" ref="view_darakjian_rapaport_quote_search"/>
+            <field name="context">{'search_default_filter_current': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">No Rapaport quotes loaded.</p>
+                <p>The mock matrix is loaded automatically on install. In Etapa 3 the live API connector will populate quotes with source=live.</p>
+            </field>
+        </record>
+
+        <menuitem id="menu_darakjian_rapaport_quote"
+                  name="Rapaport Matrix"
+                  parent="menu_darakjian_admin_section"
+                  action="action_darakjian_rapaport_quote"
+                  sequence="20"
+                  groups="group_darakjian_manager"/>
+
+    </data>
+</odoo>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_darakjian_wizard_service_intake_form" model="ir.ui.view">
+            <field name="name">darakjian.wizard.service.intake.form</field>
+            <field name="model">darakjian.wizard.service.intake</field>
+            <field name="arch" type="xml">
+                <form string="Service intake">
+                    <sheet>
+                        <group>
+                            <group string="Client and piece">
+                                <field name="partner_id"
+                                       options="{'no_create_edit': True}"/>
+                                <field name="product_id"
+                                       options="{'no_create_edit': True}"
+                                       help="Leave empty if the piece is not in our catalog."/>
+                                <field name="piece_description"
+                                       placeholder="Vintage gold ring, ~5g, single round diamond..."/>
+                                <field name="kind"/>
+                            </group>
+                            <group string="Reception">
+                                <field name="date_received"/>
+                                <field name="date_promised"/>
+                                <field name="received_by"
+                                       options="{'no_create_edit': True}"/>
+                                <field name="assigned_to"
+                                       options="{'no_create_edit': True}"/>
+                            </group>
+                        </group>
+                        <group string="Custody">
+                            <field name="custody_location"
+                                   placeholder="Safe A, drawer 3"/>
+                            <field name="intake_photo"
+                                   filename="intake_photo_filename"
+                                   widget="image"
+                                   options="{'size': [400, 300]}"/>
+                            <field name="intake_photo_filename" invisible="1"/>
+                        </group>
+                        <group string="Client request">
+                            <field name="description" nolabel="1"
+                                   placeholder="What the client asked us to do..."/>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="action_create_ticket" type="object"
+                                string="Receive piece"
+                                class="oe_highlight"/>
+                        <button special="cancel" string="Cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_darakjian_wizard_service_intake" model="ir.actions.act_window">
+            <field name="name">Service intake</field>
+            <field name="res_model">darakjian.wizard.service.intake</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="binding_model_id" ref="base.model_res_partner"/>
+            <field name="binding_view_types">form</field>
+            <field name="groups_id" eval="[(4, ref('group_darakjian_advisor'))]"/>
+        </record>
+
+    </data>
+</odoo>

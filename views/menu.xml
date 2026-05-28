@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             Root menu and high-level sections.
+             Per-model menu entries are declared in each *_views.xml file
+             and attached to the parents below via `parent=` references.
+             Load order in __manifest__.py keeps this file FIRST among
+             views/*, so the *_views.xml files can attach safely.
+             ════════════════════════════════════════════════════════════════ -->
+
+        <menuitem id="menu_darakjian_root"
+                  name="Client Book"
+                  sequence="60"
+                  groups="group_darakjian_advisor"/>
+
+        <menuitem id="menu_darakjian_process"
+                  name="Process"
+                  parent="menu_darakjian_root"
+                  sequence="10"
+                  groups="group_darakjian_advisor"/>
+
+        <menuitem id="menu_darakjian_admin_section"
+                  name="Administration"
+                  parent="menu_darakjian_root"
+                  sequence="90"
+                  groups="group_darakjian_manager"/>
+
+    </data>
+</odoo>

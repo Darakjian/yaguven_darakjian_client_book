@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_darakjian_wizard_hold_form" model="ir.ui.view">
+            <field name="name">darakjian.wizard.hold.form</field>
+            <field name="model">darakjian.wizard.hold</field>
+            <field name="arch" type="xml">
+                <form string="Place on hold">
+                    <sheet>
+                        <div class="alert alert-warning"
+                             role="alert"
+                             invisible="not existing_hold_warning">
+                            <field name="existing_hold_warning" readonly="1" nolabel="1"/>
+                        </div>
+                        <group>
+                            <group string="Piece and client">
+                                <field name="product_id"
+                                       options="{'no_create_edit': True}"/>
+                                <field name="partner_id"
+                                       options="{'no_create_edit': True}"/>
+                                <field name="salesperson_id"
+                                       options="{'no_create_edit': True}"/>
+                            </group>
+                            <group string="Window">
+                                <field name="date_start"/>
+                                <field name="expiration_mode" widget="radio"/>
+                                <field name="duration_days"
+                                       invisible="expiration_mode != 'days'"/>
+                                <field name="date_expires_explicit"
+                                       invisible="expiration_mode != 'date'"
+                                       required="expiration_mode == 'date'"/>
+                            </group>
+                        </group>
+                        <group string="Notes">
+                            <field name="notes" nolabel="1"
+                                   placeholder="Why is the client asking for a hold? Any sensitive context (size unsure, waiting on approval, gift surprise)..."/>
+                        </group>
+                        <field name="existing_hold_id" invisible="1"/>
+                    </sheet>
+                    <footer>
+                        <button name="action_create_hold" type="object"
+                                string="Place on hold"
+                                class="oe_highlight"
+                                invisible="existing_hold_id"/>
+                        <button special="cancel" string="Cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_darakjian_wizard_hold" model="ir.actions.act_window">
+            <field name="name">Place on hold</field>
+            <field name="res_model">darakjian.wizard.hold</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="groups_id" eval="[(4, ref('group_darakjian_advisor'))]"/>
+        </record>
+
+    </data>
+</odoo>

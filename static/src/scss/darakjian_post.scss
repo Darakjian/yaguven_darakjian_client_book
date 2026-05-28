@@ -1,0 +1,485 @@
+// ════════════════════════════════════════════════════════════════════════
+// Darakjian Client Book — "Post" style for tablet-facing process views
+// ────────────────────────────────────────────────────────────────────────
+// All rules are scoped to elements wrapped in .o_darakjian_post so that
+// the standard Odoo backend remains untouched in administrative views.
+// ════════════════════════════════════════════════════════════════════════
+
+// ── Design tokens ──────────────────────────────────────────────────────
+
+$dk-bg:              #FAF8F4;   // page background (warm off-white)
+$dk-surface:         #FFFFFF;   // card surface
+$dk-surface-soft:    #F3EFE8;   // muted accent surface
+$dk-ink:             #1A1A1A;   // primary text
+$dk-ink-soft:        #5C5C5C;   // secondary text
+$dk-border:          #E8E5DE;   // hairline border
+$dk-accent:          #C5A572;   // champagne gold (CTAs, highlights)
+$dk-accent-deep:     #8E7142;   // hover for accent
+$dk-success:         #5C8A6C;
+$dk-warn:            #C99344;
+$dk-danger:          #B14A4A;
+$dk-info:            #5E7793;
+
+$dk-font-heading:    'Playfair Display', 'Cormorant Garamond', 'Times New Roman', serif;
+$dk-font-body:       -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+$dk-radius-card:     14px;
+$dk-radius-pill:     999px;
+$dk-radius-button:   8px;
+
+$dk-shadow-card:     0 1px 2px rgba(26, 26, 26, 0.04),
+                     0 8px 24px rgba(26, 26, 26, 0.05);
+$dk-shadow-hover:    0 4px 12px rgba(26, 26, 26, 0.08),
+                     0 16px 40px rgba(26, 26, 26, 0.09);
+
+$dk-pad-card:        24px;
+$dk-pad-form:        32px;
+$dk-pad-tablet:      40px;
+
+$dk-touch-target:    44px;     // minimum touch target on tablet
+
+// ── Wrapper: reset the surrounding chrome to feel like a curated feed ──
+
+.o_darakjian_post {
+    background: $dk-bg !important;
+    color: $dk-ink;
+    font-family: $dk-font-body;
+    font-size: 15px;
+    line-height: 1.55;
+    letter-spacing: 0.01em;
+
+    // Hide the harsh contrast lines that mark backend forms
+    .o_form_view {
+        background: transparent;
+        border: none;
+    }
+
+    // Soften the breadcrumb / cp_top_left so it doesn't dominate
+    .o_control_panel {
+        background: $dk-bg !important;
+        border-bottom: 1px solid $dk-border;
+        padding: 12px 24px;
+
+        .breadcrumb {
+            font-family: $dk-font-body;
+            font-size: 13px;
+            color: $dk-ink-soft;
+        }
+
+        .o_cp_top_right {
+            gap: 8px;
+        }
+    }
+
+    // ── Typography ─────────────────────────────────────────────────────
+
+    h1, h2, h3, h4, .o_form_sheet .oe_title h1 {
+        font-family: $dk-font-heading;
+        font-weight: 600;
+        color: $dk-ink;
+        letter-spacing: -0.005em;
+    }
+
+    h1, .o_form_sheet .oe_title h1 {
+        font-size: 32px;
+        line-height: 1.2;
+        margin: 0 0 8px 0;
+    }
+    h2 { font-size: 24px; line-height: 1.25; }
+    h3 { font-size: 19px; line-height: 1.3; }
+
+    .o_form_label {
+        font-family: $dk-font-body;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: $dk-ink-soft;
+        font-weight: 500;
+        margin-bottom: 4px;
+    }
+
+    // ── Form view: turn the sheet into a centered, editorial card ──────
+
+    .o_form_sheet_bg {
+        background: $dk-bg;
+        padding: $dk-pad-tablet 0;
+    }
+
+    .o_form_sheet {
+        background: $dk-surface;
+        max-width: 920px;
+        margin: 0 auto;
+        padding: $dk-pad-form;
+        border-radius: $dk-radius-card;
+        box-shadow: $dk-shadow-card;
+        border: 1px solid $dk-border;
+    }
+
+    // Spacing between groups becomes a clear vertical rhythm
+    .o_inner_group {
+        padding: 16px 0;
+        border-bottom: 1px solid $dk-border;
+
+        &:last-child {
+            border-bottom: none;
+        }
+    }
+
+    // ── Kanban: process views as a feed of "posts" ─────────────────────
+
+    .o_kanban_view {
+        background: $dk-bg !important;
+        padding: 16px 8px;
+    }
+
+    .o_kanban_record.o_darakjian_post_card {
+        background: $dk-surface;
+        border: 1px solid $dk-border;
+        border-radius: $dk-radius-card;
+        box-shadow: $dk-shadow-card;
+        padding: $dk-pad-card;
+        margin: 12px;
+        width: calc(50% - 24px);
+        min-height: 220px;
+        transition: box-shadow 0.18s ease, transform 0.18s ease;
+        cursor: pointer;
+
+        &:hover {
+            box-shadow: $dk-shadow-hover;
+            transform: translateY(-2px);
+        }
+
+        // Hero image area for product/piece-related cards
+        .o_dk_post_hero {
+            margin: -#{$dk-pad-card} -#{$dk-pad-card} $dk-pad-card -#{$dk-pad-card};
+            height: 220px;
+            background: $dk-surface-soft center/cover no-repeat;
+            border-radius: $dk-radius-card $dk-radius-card 0 0;
+            position: relative;
+            overflow: hidden;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+            }
+        }
+
+        .o_dk_post_title {
+            font-family: $dk-font-heading;
+            font-size: 20px;
+            line-height: 1.25;
+            color: $dk-ink;
+            margin: 0 0 4px 0;
+            font-weight: 600;
+        }
+
+        .o_dk_post_subtitle {
+            font-size: 13px;
+            color: $dk-ink-soft;
+            margin-bottom: 12px;
+            letter-spacing: 0.03em;
+        }
+
+        .o_dk_post_body {
+            font-size: 14px;
+            color: $dk-ink;
+            line-height: 1.55;
+        }
+
+        .o_dk_post_meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid $dk-border;
+            font-size: 12px;
+            color: $dk-ink-soft;
+        }
+
+        .o_dk_post_footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 16px;
+            gap: 12px;
+        }
+    }
+
+    // ── State pills (used in kanban + form headers) ────────────────────
+
+    .o_dk_pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 14px;
+        border-radius: $dk-radius-pill;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        background: $dk-surface-soft;
+        color: $dk-ink;
+        border: 1px solid $dk-border;
+        line-height: 1.2;
+
+        &.o_dk_pill_active,
+        &.o_dk_pill_confirmed,
+        &.o_dk_pill_in_workshop,
+        &.o_dk_pill_approved {
+            background: rgba($dk-accent, 0.12);
+            color: $dk-accent-deep;
+            border-color: rgba($dk-accent, 0.32);
+        }
+
+        &.o_dk_pill_done,
+        &.o_dk_pill_delivered,
+        &.o_dk_pill_paid,
+        &.o_dk_pill_ready,
+        &.o_dk_pill_converted {
+            background: rgba($dk-success, 0.12);
+            color: $dk-success;
+            border-color: rgba($dk-success, 0.32);
+        }
+
+        &.o_dk_pill_draft,
+        &.o_dk_pill_received,
+        &.o_dk_pill_calculated {
+            background: rgba($dk-info, 0.10);
+            color: $dk-info;
+            border-color: rgba($dk-info, 0.28);
+        }
+
+        &.o_dk_pill_expired,
+        &.o_dk_pill_no_show,
+        &.o_dk_pill_warn {
+            background: rgba($dk-warn, 0.12);
+            color: $dk-warn;
+            border-color: rgba($dk-warn, 0.32);
+        }
+
+        &.o_dk_pill_cancelled,
+        &.o_dk_pill_danger {
+            background: rgba($dk-danger, 0.10);
+            color: $dk-danger;
+            border-color: rgba($dk-danger, 0.32);
+        }
+    }
+
+    // ── Buttons: touch-friendly, generous, no harsh corners ────────────
+
+    .btn,
+    .o_dk_btn {
+        min-height: $dk-touch-target;
+        padding: 0 22px;
+        border-radius: $dk-radius-button;
+        font-family: $dk-font-body;
+        font-size: 14px;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+        border: 1px solid transparent;
+        transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-primary,
+    .o_dk_btn_primary {
+        background: $dk-accent;
+        color: #FFFFFF;
+        border-color: $dk-accent;
+
+        &:hover, &:focus {
+            background: $dk-accent-deep;
+            border-color: $dk-accent-deep;
+            color: #FFFFFF;
+        }
+    }
+
+    .btn-secondary,
+    .o_dk_btn_secondary {
+        background: transparent;
+        color: $dk-ink;
+        border-color: $dk-border;
+
+        &:hover, &:focus {
+            background: $dk-surface-soft;
+            border-color: $dk-ink-soft;
+        }
+    }
+
+    .btn-danger,
+    .o_dk_btn_danger {
+        background: transparent;
+        color: $dk-danger;
+        border-color: rgba($dk-danger, 0.32);
+
+        &:hover, &:focus {
+            background: rgba($dk-danger, 0.08);
+        }
+    }
+
+    // ── Inline pills used inside post cards (chips for 4Cs, badges) ────
+
+    .o_dk_4cs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 10px 0 0 0;
+    }
+
+    .o_dk_pill_4cs {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 10px;
+        border-radius: $dk-radius-pill;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        background: $dk-surface-soft;
+        color: $dk-ink;
+        border: 1px solid $dk-border;
+        line-height: 1.3;
+    }
+
+    // ── Hold-specific dates display ────────────────────────────────────
+
+    .o_dk_hold_dates {
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+        margin: 8px 0;
+        font-size: 13px;
+
+        strong {
+            color: $dk-ink;
+            font-weight: 600;
+        }
+    }
+
+    // ── Price display (Rapaport ref on gem cards) ──────────────────────
+
+    .o_dk_price {
+        font-family: $dk-font-heading;
+        font-size: 22px;
+        font-weight: 600;
+        color: $dk-accent-deep;
+        letter-spacing: -0.01em;
+    }
+
+    .o_dk_price_meta {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: $dk-ink-soft;
+        margin-left: 8px;
+    }
+
+    // ── Composite blocks ───────────────────────────────────────────────
+
+    .o_dk_four_cs_grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin: 16px 0;
+
+        .o_dk_four_cs_item {
+            background: $dk-surface-soft;
+            border-radius: $dk-radius-button;
+            padding: 14px 12px;
+            text-align: center;
+
+            .o_dk_four_cs_label {
+                font-size: 11px;
+                text-transform: uppercase;
+                letter-spacing: 0.08em;
+                color: $dk-ink-soft;
+                margin-bottom: 4px;
+            }
+            .o_dk_four_cs_value {
+                font-family: $dk-font-heading;
+                font-size: 22px;
+                color: $dk-ink;
+                font-weight: 600;
+            }
+        }
+    }
+
+    .o_dk_certification_block {
+        margin: 16px 0;
+        padding: 16px 18px;
+        border: 1px solid $dk-border;
+        border-radius: $dk-radius-button;
+        background: $dk-surface-soft;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+
+        .o_dk_cert_label {
+            font-family: $dk-font-heading;
+            font-size: 14px;
+            color: $dk-ink;
+            font-weight: 600;
+        }
+        .o_dk_cert_number {
+            font-family: monospace;
+            font-size: 13px;
+            color: $dk-ink-soft;
+        }
+    }
+
+    // ── Dashboard tiles ────────────────────────────────────────────────
+
+    .o_dk_dashboard {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: $dk-pad-tablet 24px;
+
+        .o_dk_dashboard_grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .o_dk_dashboard_tile {
+            background: $dk-surface;
+            border: 1px solid $dk-border;
+            border-radius: $dk-radius-card;
+            padding: $dk-pad-card;
+            box-shadow: $dk-shadow-card;
+
+            .o_dk_tile_label {
+                font-size: 12px;
+                text-transform: uppercase;
+                letter-spacing: 0.08em;
+                color: $dk-ink-soft;
+                margin-bottom: 6px;
+            }
+            .o_dk_tile_value {
+                font-family: $dk-font-heading;
+                font-size: 36px;
+                line-height: 1.1;
+                color: $dk-ink;
+                font-weight: 600;
+            }
+        }
+    }
+
+    // ── Responsive: tablet portrait fallback ───────────────────────────
+
+    @media (max-width: 900px) {
+        .o_kanban_record.o_darakjian_post_card {
+            width: calc(100% - 24px);
+        }
+        .o_form_sheet {
+            margin: 0 16px;
+            padding: 24px;
+        }
+        .o_dk_four_cs_grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+}

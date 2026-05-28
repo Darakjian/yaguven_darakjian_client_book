@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             KANBAN — Editorial wishlist feed
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="view_darakjian_wishlist_kanban" model="ir.ui.view">
+            <field name="name">darakjian.wishlist.kanban</field>
+            <field name="model">darakjian.wishlist</field>
+            <field name="arch" type="xml">
+                <kanban class="o_darakjian_post" default_order="create_date desc" sample="1">
+                    <field name="id"/>
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="salesperson_id"/>
+                    <field name="source"/>
+                    <field name="state"/>
+                    <field name="line_count"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="o_kanban_record o_darakjian_post_card">
+                                <div class="o_dk_post_title">
+                                    <i class="fa fa-bookmark-o me-2"/>
+                                    <field name="partner_id"/>
+                                </div>
+                                <div class="o_dk_post_subtitle">
+                                    <field name="source"/>
+                                    · <field name="line_count"/> piece(s)
+                                </div>
+                                <div class="o_dk_post_body">
+                                    <div class="o_dk_post_meta">
+                                        <i class="fa fa-user-circle-o me-1"/>
+                                        <field name="salesperson_id"/>
+                                    </div>
+                                </div>
+                                <div class="o_dk_post_footer">
+                                    <span t-attf-class="o_dk_pill o_dk_pill_#{record.state.raw_value}">
+                                        <field name="state"/>
+                                    </span>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             FORM — Wishlist with embedded lines
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="view_darakjian_wishlist_form" model="ir.ui.view">
+            <field name="name">darakjian.wishlist.form</field>
+            <field name="model">darakjian.wishlist</field>
+            <field name="arch" type="xml">
+                <form class="o_darakjian_post">
+                    <header>
+                        <button name="action_activate" type="object"
+                                string="Activate"
+                                class="oe_highlight"
+                                invisible="state == 'active'"/>
+                        <button name="action_archive_wishlist" type="object"
+                                string="Archive"
+                                invisible="state == 'archived'"/>
+                        <button name="action_reset_to_draft" type="object"
+                                string="Reset to draft"
+                                invisible="state == 'draft'"/>
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="draft,active,archived"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" placeholder="Wishlist of..."/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group string="Client and advisor">
+                                <field name="partner_id"
+                                       options="{'no_create_edit': True}"
+                                       readonly="state == 'archived'"/>
+                                <field name="salesperson_id"
+                                       readonly="state == 'archived'"/>
+                            </group>
+                            <group string="Origin">
+                                <field name="source"
+                                       readonly="state == 'archived'"/>
+                                <field name="active"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Pieces" name="lines">
+                                <field name="line_ids"
+                                       readonly="state == 'archived'">
+                                    <list editable="bottom" default_order="priority desc, sequence asc">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="product_id"
+                                               options="{'no_create_edit': True}"/>
+                                        <field name="priority" widget="priority"/>
+                                        <field name="notes" optional="show"/>
+                                        <field name="is_fulfilled"
+                                               widget="boolean_toggle"/>
+                                    </list>
+                                </field>
+                            </page>
+                            <page string="Notes" name="notes">
+                                <field name="notes" nolabel="1"
+                                       placeholder="What the client is dreaming about, anniversaries, sizes already known..."/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             LIST
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="view_darakjian_wishlist_list" model="ir.ui.view">
+            <field name="name">darakjian.wishlist.list</field>
+            <field name="model">darakjian.wishlist</field>
+            <field name="arch" type="xml">
+                <list default_order="create_date desc">
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="salesperson_id"/>
+                    <field name="source"/>
+                    <field name="line_count" string="Pieces"/>
+                    <field name="state" decoration-success="state == 'active'"
+                                         decoration-muted="state in ('draft', 'archived')"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             SEARCH
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="view_darakjian_wishlist_search" model="ir.ui.view">
+            <field name="name">darakjian.wishlist.search</field>
+            <field name="model">darakjian.wishlist</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="salesperson_id"/>
+                    <filter name="filter_mine" string="Mine"
+                            domain="[('salesperson_id', '=', uid)]"/>
+                    <filter name="filter_active" string="Active"
+                            domain="[('state', '=', 'active')]"/>
+                    <filter name="filter_draft" string="Draft"
+                            domain="[('state', '=', 'draft')]"/>
+                    <filter name="filter_archived" string="Archived"
+                            domain="[('state', '=', 'archived')]"/>
+                    <separator/>
+                    <filter name="filter_source_web" string="From web"
+                            domain="[('source', '=', 'web')]"/>
+                    <filter name="filter_source_showroom" string="From showroom"
+                            domain="[('source', '=', 'showroom')]"/>
+                    <filter name="filter_source_advisor" string="From advisor"
+                            domain="[('source', '=', 'advisor')]"/>
+                    <group expand="0" string="Group by">
+                        <filter name="groupby_state" string="State"
+                                context="{'group_by': 'state'}"/>
+                        <filter name="groupby_salesperson" string="Advisor"
+                                context="{'group_by': 'salesperson_id'}"/>
+                        <filter name="groupby_partner" string="Client"
+                                context="{'group_by': 'partner_id'}"/>
+                        <filter name="groupby_source" string="Source"
+                                context="{'group_by': 'source'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             WINDOW ACTION + MENU ITEM
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="action_darakjian_wishlist" model="ir.actions.act_window">
+            <field name="name">Wishlists</field>
+            <field name="res_model">darakjian.wishlist</field>
+            <field name="view_mode">kanban,list,form</field>
+            <field name="search_view_id" ref="view_darakjian_wishlist_search"/>
+            <field name="context">{'search_default_filter_mine': 1, 'search_default_filter_active': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">No wishlists yet.</p>
+                <p>Curate a list of pieces with each client. Sync the showroom and the web in a single place that the advisor controls.</p>
+            </field>
+        </record>
+
+        <menuitem id="menu_darakjian_wishlist"
+                  name="Wishlists"
+                  parent="menu_darakjian_process"
+                  action="action_darakjian_wishlist"
+                  sequence="40"
+                  groups="group_darakjian_advisor"/>
+
+    </data>
+</odoo>

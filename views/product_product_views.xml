@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             PRODUCT.TEMPLATE FORM — Gem card + Hold smart buttons
+             Inherits the standard product form, restricted to advisors+.
+             Templates expose related fields from their single variant so
+             the buttons work for Darakjian's unique-piece catalog.
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="view_product_template_form_darakjian" model="ir.ui.view">
+            <field name="name">product.template.form.darakjian.client.book</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view"/>
+            <field name="groups_id" eval="[(4, ref('group_darakjian_advisor'))]"/>
+            <field name="arch" type="xml">
+
+                <!-- ════════════════════════════════════════════════════════
+                     SMART BUTTONS
+                     ════════════════════════════════════════════════════════ -->
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button name="action_open_or_create_gem_card" type="object"
+                            class="oe_stat_button" icon="fa-diamond">
+                        <span class="o_stat_text">Gem card</span>
+                        <span class="o_stat_value"
+                              invisible="darakjian_gem_card_id">Create</span>
+                        <span class="o_stat_value"
+                              invisible="not darakjian_gem_card_id">Open</span>
+                    </button>
+                    <button name="action_open_darakjian_active_hold" type="object"
+                            class="oe_stat_button" icon="fa-lock"
+                            invisible="not darakjian_has_active_hold">
+                        <span class="o_stat_text">Hold</span>
+                        <span class="o_stat_value">Active</span>
+                    </button>
+                    <button name="%(yaguven_darakjian_client_book.action_darakjian_wizard_hold)d"
+                            type="action"
+                            class="oe_stat_button" icon="fa-lock"
+                            invisible="darakjian_has_active_hold"
+                            context="{'default_product_id': product_variant_id}">
+                        <span class="o_stat_text">New</span>
+                        <span class="o_stat_value">Hold</span>
+                    </button>
+                </xpath>
+
+                <!-- ════════════════════════════════════════════════════════
+                     RIBBON — "On hold" visible at a glance
+                     ════════════════════════════════════════════════════════ -->
+                <xpath expr="//sheet" position="inside">
+                    <widget name="web_ribbon" title="On hold"
+                            bg_color="text-bg-warning"
+                            invisible="not darakjian_has_active_hold"/>
+                </xpath>
+
+            </field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             PRODUCT.TEMPLATE LIST — Optional column for the hold flag
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="view_product_template_list_darakjian" model="ir.ui.view">
+            <field name="name">product.template.list.darakjian.client.book</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_tree_view"/>
+            <field name="groups_id" eval="[(4, ref('group_darakjian_advisor'))]"/>
+            <field name="arch" type="xml">
+                <xpath expr="//list" position="inside">
+                    <field name="darakjian_has_active_hold"
+                           string="On hold"
+                           optional="hide"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             PRODUCT.TEMPLATE SEARCH — Filter "On hold"
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="view_product_template_search_darakjian" model="ir.ui.view">
+            <field name="name">product.template.search.darakjian.client.book</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_search_view"/>
+            <field name="groups_id" eval="[(4, ref('group_darakjian_advisor'))]"/>
+            <field name="arch" type="xml">
+                <xpath expr="//search" position="inside">
+                    <separator/>
+                    <filter name="filter_on_hold" string="On hold"
+                            domain="[('darakjian_has_active_hold', '=', True)]"/>
+                    <filter name="filter_with_gem_card" string="With gem card"
+                            domain="[('darakjian_gem_card_id', '!=', False)]"/>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

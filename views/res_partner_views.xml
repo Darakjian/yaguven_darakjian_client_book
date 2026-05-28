@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             RES.PARTNER FORM — Client Book 360°
+             Inherits the native partner form, adds smart buttons and a
+             dedicated "Client Book" page. Visible only to advisors and up
+             (managers and admins inherit the advisor group via implied_ids).
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="view_partner_form_darakjian_client_book" model="ir.ui.view">
+            <field name="name">res.partner.form.darakjian.client.book</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="groups_id" eval="[(4, ref('group_darakjian_advisor'))]"/>
+            <field name="arch" type="xml">
+
+                <!-- ════════════════════════════════════════════════════════
+                     SMART BUTTONS
+                     ════════════════════════════════════════════════════════ -->
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button name="action_open_darakjian_appointments" type="object"
+                            class="oe_stat_button" icon="fa-calendar"
+                            invisible="darakjian_appointments_count == 0">
+                        <field name="darakjian_appointments_count"
+                               widget="statinfo" string="Appointments"/>
+                    </button>
+                    <button name="action_open_darakjian_holds" type="object"
+                            class="oe_stat_button" icon="fa-lock"
+                            invisible="darakjian_active_holds_count == 0">
+                        <field name="darakjian_active_holds_count"
+                               widget="statinfo" string="Active holds"/>
+                    </button>
+                    <button name="action_open_darakjian_wishlists" type="object"
+                            class="oe_stat_button" icon="fa-bookmark-o"
+                            invisible="darakjian_wishlists_count == 0">
+                        <field name="darakjian_wishlists_count"
+                               widget="statinfo" string="Wishlists"/>
+                    </button>
+                    <button name="action_open_darakjian_service_tickets" type="object"
+                            class="oe_stat_button" icon="fa-wrench"
+                            invisible="darakjian_service_tickets_open_count == 0">
+                        <field name="darakjian_service_tickets_open_count"
+                               widget="statinfo" string="Open services"/>
+                    </button>
+                    <button name="action_open_darakjian_families" type="object"
+                            class="oe_stat_button" icon="fa-users"
+                            invisible="not darakjian_family_ids">
+                        <field name="darakjian_family_ids"
+                               widget="statinfo" string="Families"
+                               readonly="1"/>
+                    </button>
+                    <button name="action_open_darakjian_assignments" type="object"
+                            class="oe_stat_button" icon="fa-id-badge"
+                            groups="yaguven_darakjian_client_book.group_darakjian_manager">
+                        <span class="o_stat_text">Assignments</span>
+                        <span class="o_stat_value">History</span>
+                    </button>
+                    <button name="%(yaguven_darakjian_client_book.action_darakjian_wizard_appointment)d"
+                            type="action"
+                            class="oe_stat_button" icon="fa-calendar-plus-o"
+                            context="{'default_partner_id': active_id}">
+                        <span class="o_stat_text">Schedule</span>
+                        <span class="o_stat_value">Visit</span>
+                    </button>
+                    <button name="%(yaguven_darakjian_client_book.action_darakjian_wizard_service_intake)d"
+                            type="action"
+                            class="oe_stat_button" icon="fa-wrench"
+                            context="{'default_partner_id': active_id}">
+                        <span class="o_stat_text">Receive</span>
+                        <span class="o_stat_value">Piece</span>
+                    </button>
+                </xpath>
+
+                <!-- ════════════════════════════════════════════════════════
+                     NOTEBOOK — Client Book page
+                     ════════════════════════════════════════════════════════ -->
+                <xpath expr="//notebook" position="inside">
+                    <page string="Client Book" name="darakjian_client_book">
+                        <group>
+                            <group string="Relationship">
+                                <field name="darakjian_titular_user_id"
+                                       readonly="1"
+                                       options="{'no_open': True}"/>
+                                <field name="darakjian_family_ids"
+                                       widget="many2many_tags"
+                                       readonly="1"
+                                       options="{'no_create': True}"/>
+                            </group>
+                            <group string="Next visit">
+                                <field name="darakjian_appointment_next_id"
+                                       readonly="1"
+                                       options="{'no_open': True}"/>
+                            </group>
+                        </group>
+                        <separator string="What we know about this client"/>
+                        <p class="text-muted oe_grey">
+                            Use the smart buttons at the top of the form to
+                            navigate to appointments, holds, wishlists, services
+                            and families. The titular advisor and next visit are
+                            kept in sync automatically.
+                        </p>
+                    </page>
+                </xpath>
+
+            </field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             RES.PARTNER LIST — Show titular advisor as an optional column
+             for advisors / managers
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="view_partner_tree_darakjian_client_book" model="ir.ui.view">
+            <field name="name">res.partner.list.darakjian.client.book</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_tree"/>
+            <field name="groups_id" eval="[(4, ref('group_darakjian_advisor'))]"/>
+            <field name="arch" type="xml">
+                <xpath expr="//list" position="inside">
+                    <field name="darakjian_titular_user_id"
+                           string="Titular advisor"
+                           optional="hide"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             RES.PARTNER SEARCH — Filters for the showroom workflow
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="view_partner_search_darakjian_client_book" model="ir.ui.view">
+            <field name="name">res.partner.search.darakjian.client.book</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_res_partner_filter"/>
+            <field name="groups_id" eval="[(4, ref('group_darakjian_advisor'))]"/>
+            <field name="arch" type="xml">
+                <xpath expr="//search" position="inside">
+                    <separator/>
+                    <filter name="filter_my_clients" string="My clients"
+                            domain="[('darakjian_titular_user_id', '=', uid)]"/>
+                    <filter name="filter_with_active_hold" string="With active hold"
+                            domain="[('darakjian_active_holds_count', '&gt;', 0)]"/>
+                    <filter name="filter_with_open_service" string="With open service"
+                            domain="[('darakjian_service_tickets_open_count', '&gt;', 0)]"/>
+                    <filter name="filter_with_upcoming_visit" string="With upcoming visit"
+                            domain="[('darakjian_appointment_next_id', '!=', False)]"/>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

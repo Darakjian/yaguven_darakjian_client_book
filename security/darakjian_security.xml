@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <!-- ════════════════════════════════════════════════════════════════
+             MODULE CATEGORY (appears in user form, Settings > Users)
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="module_category_darakjian_client_book" model="ir.module.category">
+            <field name="name">Darakjian Client Book</field>
+            <field name="description">Access rights for the Darakjian Client Book module.</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             GROUPS (hierarchical: admin > manager > advisor > internal user)
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="group_darakjian_advisor" model="res.groups">
+            <field name="name">Advisor</field>
+            <field name="category_id" ref="module_category_darakjian_client_book"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+            <field name="comment">Showroom advisor. Reads and writes records tied to clients they are assigned to.</field>
+        </record>
+
+        <record id="group_darakjian_manager" model="res.groups">
+            <field name="name">Showroom Manager</field>
+            <field name="category_id" ref="module_category_darakjian_client_book"/>
+            <field name="implied_ids" eval="[(4, ref('group_darakjian_advisor'))]"/>
+            <field name="comment">Showroom manager. Sees and edits records of all advisors; approves commissions.</field>
+        </record>
+
+        <record id="group_darakjian_admin" model="res.groups">
+            <field name="name">Module Administrator</field>
+            <field name="category_id" ref="module_category_darakjian_client_book"/>
+            <field name="implied_ids" eval="[(4, ref('group_darakjian_manager'))]"/>
+            <field name="comment">Configures commission rules, hold expiration parameters, and module-wide settings.</field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             MULTI-COMPANY RULES (applied globally to all module models)
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="rule_family_multi_company" model="ir.rule">
+            <field name="name">Darakjian Family: multi-company</field>
+            <field name="model_id" ref="model_darakjian_family"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_family_member_multi_company" model="ir.rule">
+            <field name="name">Darakjian Family Member: multi-company</field>
+            <field name="model_id" ref="model_darakjian_family_member"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_assignment_multi_company" model="ir.rule">
+            <field name="name">Darakjian Salesperson Assignment: multi-company</field>
+            <field name="model_id" ref="model_darakjian_salesperson_assignment"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_wishlist_multi_company" model="ir.rule">
+            <field name="name">Darakjian Wishlist: multi-company</field>
+            <field name="model_id" ref="model_darakjian_wishlist"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_wishlist_line_multi_company" model="ir.rule">
+            <field name="name">Darakjian Wishlist Line: multi-company</field>
+            <field name="model_id" ref="model_darakjian_wishlist_line"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_hold_multi_company" model="ir.rule">
+            <field name="name">Darakjian Hold: multi-company</field>
+            <field name="model_id" ref="model_darakjian_hold"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_appointment_multi_company" model="ir.rule">
+            <field name="name">Darakjian Appointment: multi-company</field>
+            <field name="model_id" ref="model_darakjian_appointment"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_service_ticket_multi_company" model="ir.rule">
+            <field name="name">Darakjian Service Ticket: multi-company</field>
+            <field name="model_id" ref="model_darakjian_service_ticket"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_commission_rule_multi_company" model="ir.rule">
+            <field name="name">Darakjian Commission Rule: multi-company</field>
+            <field name="model_id" ref="model_darakjian_commission_rule"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_commission_multi_company" model="ir.rule">
+            <field name="name">Darakjian Commission: multi-company</field>
+            <field name="model_id" ref="model_darakjian_commission"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_rapaport_quote_multi_company" model="ir.rule">
+            <field name="name">Darakjian Rapaport Quote: multi-company</field>
+            <field name="model_id" ref="model_darakjian_rapaport_quote"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             ADVISOR-SCOPE RULES (restrict to records tied to the user)
+             ──────────────────────────────────────────────────────────────
+             Pattern: per model, a restrictive rule for the advisor group,
+             complemented by a "see all" rule for the manager group.
+             A user with both groups sees the OR of both rules → sees all.
+             ════════════════════════════════════════════════════════════════ -->
+
+        <!-- Salesperson assignment: advisor sees own, manager sees all -->
+        <record id="rule_assignment_advisor" model="ir.rule">
+            <field name="name">Salesperson Assignment: advisor sees own</field>
+            <field name="model_id" ref="model_darakjian_salesperson_assignment"/>
+            <field name="groups" eval="[(4, ref('group_darakjian_advisor'))]"/>
+            <field name="domain_force">[('user_id', '=', user.id)]</field>
+        </record>
+        <record id="rule_assignment_manager" model="ir.rule">
+            <field name="name">Salesperson Assignment: manager sees all</field>
+            <field name="model_id" ref="model_darakjian_salesperson_assignment"/>
+            <field name="groups" eval="[(4, ref('group_darakjian_manager'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <!-- Wishlist: advisor sees own (salesperson_id = self) -->
+        <record id="rule_wishlist_advisor" model="ir.rule">
+            <field name="name">Wishlist: advisor sees own</field>
+            <field name="model_id" ref="model_darakjian_wishlist"/>
+            <field name="groups" eval="[(4, ref('group_darakjian_advisor'))]"/>
+            <field name="domain_force">['|', ('salesperson_id', '=', user.id), ('salesperson_id', '=', False)]</field>
+        </record>
+        <record id="rule_wishlist_manager" model="ir.rule">
+            <field name="name">Wishlist: manager sees all</field>
+            <field name="model_id" ref="model_darakjian_wishlist"/>
+            <field name="groups" eval="[(4, ref('group_darakjian_manager'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <record id="rule_wishlist_line_advisor" model="ir.rule">
+            <field name="name">Wishlist Line: advisor sees own</field>
+            <field name="model_id" ref="model_darakjian_wishlist_line"/>
+            <field name="groups" eval="[(4, ref('group_darakjian_advisor'))]"/>
+            <field name="domain_force">['|', ('wishlist_id.salesperson_id', '=', user.id), ('wishlist_id.salesperson_id', '=', False)]</field>
+        </record>
+        <record id="rule_wishlist_line_manager" model="ir.rule">
+            <field name="name">Wishlist Line: manager sees all</field>
+            <field name="model_id" ref="model_darakjian_wishlist_line"/>
+            <field name="groups" eval="[(4, ref('group_darakjian_manager'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <!-- Hold: advisor sees own -->
+        <record id="rule_hold_advisor" model="ir.rule">
+            <field name="name">Hold: advisor sees own</field>
+            <field name="model_id" ref="model_darakjian_hold"/>
+            <field name="groups" eval="[(4, ref('group_darakjian_advisor'))]"/>
+            <field name="domain_force">[('salesperson_id', '=', user.id)]</field>
+        </record>
+        <record id="rule_hold_manager" model="ir.rule">
+            <field name="name">Hold: manager sees all</field>
+            <field name="model_id" ref="model_darakjian_hold"/>
+            <field name="groups" eval="[(4, ref('group_darakjian_manager'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <!-- Appointment: advisor sees own -->
+        <record id="rule_appointment_advisor" model="ir.rule">
+            <field name="name">Appointment: advisor sees own</field>
+            <field name="model_id" ref="model_darakjian_appointment"/>
+            <field name="groups" eval="[(4, ref('group_darakjian_advisor'))]"/>
+            <field name="domain_force">[('salesperson_id', '=', user.id)]</field>
+        </record>
+        <record id="rule_appointment_manager" model="ir.rule">
+            <field name="name">Appointment: manager sees all</field>
+            <field name="model_id" ref="model_darakjian_appointment"/>
+            <field name="groups" eval="[(4, ref('group_darakjian_manager'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <!-- Service ticket: advisor sees the ones they received or are assigned to -->
+        <record id="rule_service_ticket_advisor" model="ir.rule">
+            <field name="name">Service Ticket: advisor sees own</field>
+            <field name="model_id" ref="model_darakjian_service_ticket"/>
+            <field name="groups" eval="[(4, ref('group_darakjian_advisor'))]"/>
+            <field name="domain_force">['|', ('received_by', '=', user.id), ('assigned_to', '=', user.id)]</field>
+        </record>
+        <record id="rule_service_ticket_manager" model="ir.rule">
+            <field name="name">Service Ticket: manager sees all</field>
+            <field name="model_id" ref="model_darakjian_service_ticket"/>
+            <field name="groups" eval="[(4, ref('group_darakjian_manager'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <!-- Commission: advisor sees own -->
+        <record id="rule_commission_advisor" model="ir.rule">
+            <field name="name">Commission: advisor sees own</field>
+            <field name="model_id" ref="model_darakjian_commission"/>
+            <field name="groups" eval="[(4, ref('group_darakjian_advisor'))]"/>
+            <field name="domain_force">[('user_id', '=', user.id)]</field>
+        </record>
+        <record id="rule_commission_manager" model="ir.rule">
+            <field name="name">Commission: manager sees all</field>
+            <field name="model_id" ref="model_darakjian_commission"/>
+            <field name="groups" eval="[(4, ref('group_darakjian_manager'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             FAMILY RULES
+             Advisors can read all families (low sensitivity, helps recognize
+             relations across clients) and only modify the ones they created.
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="rule_family_advisor_read" model="ir.rule">
+            <field name="name">Family: advisor reads all</field>
+            <field name="model_id" ref="model_darakjian_family"/>
+            <field name="groups" eval="[(4, ref('group_darakjian_advisor'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+        <record id="rule_family_advisor_write" model="ir.rule">
+            <field name="name">Family: advisor edits own</field>
+            <field name="model_id" ref="model_darakjian_family"/>
+            <field name="groups" eval="[(4, ref('group_darakjian_advisor'))]"/>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+            <field name="domain_force">[('create_uid', '=', user.id)]</field>
+        </record>
+        <record id="rule_family_manager" model="ir.rule">
+            <field name="name">Family: manager has full access</field>
+            <field name="model_id" ref="model_darakjian_family"/>
+            <field name="groups" eval="[(4, ref('group_darakjian_manager'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <record id="rule_family_member_advisor_read" model="ir.rule">
+            <field name="name">Family Member: advisor reads all</field>
+            <field name="model_id" ref="model_darakjian_family_member"/>
+            <field name="groups" eval="[(4, ref('group_darakjian_advisor'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+        <record id="rule_family_member_advisor_write" model="ir.rule">
+            <field name="name">Family Member: advisor edits in own families</field>
+            <field name="model_id" ref="model_darakjian_family_member"/>
+            <field name="groups" eval="[(4, ref('group_darakjian_advisor'))]"/>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+            <field name="domain_force">[('family_id.create_uid', '=', user.id)]</field>
+        </record>
+        <record id="rule_family_member_manager" model="ir.rule">
+            <field name="name">Family Member: manager has full access</field>
+            <field name="model_id" ref="model_darakjian_family_member"/>
+            <field name="groups" eval="[(4, ref('group_darakjian_manager'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+    </data>
+</odoo>

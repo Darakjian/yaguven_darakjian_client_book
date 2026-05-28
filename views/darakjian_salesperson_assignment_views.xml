@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             LIST — Primary view (operational ledger of assignments)
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="view_darakjian_salesperson_assignment_list" model="ir.ui.view">
+            <field name="name">darakjian.salesperson.assignment.list</field>
+            <field name="model">darakjian.salesperson.assignment</field>
+            <field name="arch" type="xml">
+                <list default_order="partner_id, date_from desc, id desc">
+                    <field name="partner_id"/>
+                    <field name="user_id"/>
+                    <field name="date_from"/>
+                    <field name="date_to" optional="show"/>
+                    <field name="is_current" widget="boolean_toggle"
+                           decoration-success="is_current"/>
+                    <field name="reason" optional="hide"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             FORM
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="view_darakjian_salesperson_assignment_form" model="ir.ui.view">
+            <field name="name">darakjian.salesperson.assignment.form</field>
+            <field name="model">darakjian.salesperson.assignment</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="action_close" type="object"
+                                string="Close assignment"
+                                class="oe_highlight"
+                                invisible="not is_current"
+                                confirm="Close this assignment as of today? The client will have no titular advisor until a new one is opened."/>
+                    </header>
+                    <sheet>
+                        <widget name="web_ribbon" title="Current"
+                                bg_color="text-bg-success"
+                                invisible="not is_current"/>
+                        <group>
+                            <group string="Pairing">
+                                <field name="partner_id"
+                                       options="{'no_create_edit': True}"/>
+                                <field name="user_id"
+                                       options="{'no_create_edit': True}"/>
+                                <field name="active"/>
+                            </group>
+                            <group string="Window">
+                                <field name="date_from"/>
+                                <field name="date_to"
+                                       help="Empty while the assignment is current."/>
+                                <field name="is_current" readonly="1"/>
+                            </group>
+                        </group>
+                        <group string="Reason">
+                            <field name="reason" nolabel="1"
+                                   placeholder="Why was this assignment opened or closed (e.g. reassignment due to vacations, client request, advisor change)..."/>
+                        </group>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             SEARCH
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="view_darakjian_salesperson_assignment_search" model="ir.ui.view">
+            <field name="name">darakjian.salesperson.assignment.search</field>
+            <field name="model">darakjian.salesperson.assignment</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="partner_id"/>
+                    <field name="user_id"/>
+                    <filter name="filter_mine" string="Mine"
+                            domain="[('user_id', '=', uid)]"/>
+                    <filter name="filter_current" string="Current"
+                            domain="[('is_current', '=', True), ('active', '=', True)]"/>
+                    <filter name="filter_historical" string="Closed"
+                            domain="[('is_current', '=', False)]"/>
+                    <separator/>
+                    <filter name="filter_with_reason" string="With reason"
+                            domain="[('reason', '!=', False)]"/>
+                    <group expand="0" string="Group by">
+                        <filter name="groupby_user" string="Advisor"
+                                context="{'group_by': 'user_id'}"/>
+                        <filter name="groupby_partner" string="Client"
+                                context="{'group_by': 'partner_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             WINDOW ACTION + MENU ITEM
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="action_darakjian_salesperson_assignment" model="ir.actions.act_window">
+            <field name="name">Salesperson Assignments</field>
+            <field name="res_model">darakjian.salesperson.assignment</field>
+            <field name="view_mode">list,form</field>
+            <field name="search_view_id" ref="view_darakjian_salesperson_assignment_search"/>
+            <field name="context">{'search_default_filter_current': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">No assignments yet.</p>
+                <p>Each client has one titular advisor at a time. The history of pairings stays here so we can answer "who took care of this client before".</p>
+            </field>
+        </record>
+
+        <menuitem id="menu_darakjian_salesperson_assignment"
+                  name="Salesperson Assignments"
+                  parent="menu_darakjian_admin_section"
+                  action="action_darakjian_salesperson_assignment"
+                  sequence="10"
+                  groups="group_darakjian_manager"/>
+
+    </data>
+</odoo>

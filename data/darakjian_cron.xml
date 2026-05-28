@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="cron_expire_holds" model="ir.cron">
+            <field name="name">Darakjian — Expire holds</field>
+            <field name="model_id" ref="model_darakjian_hold"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_expire_holds()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
+            <field name="numbercall">-1</field>
+            <field name="active" eval="True"/>
+            <field name="doall" eval="False"/>
+        </record>
+
+        <record id="cron_warn_expiring_holds" model="ir.cron">
+            <field name="name">Darakjian — Warn advisors about expiring holds</field>
+            <field name="model_id" ref="model_darakjian_hold"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_warn_expiring_holds(warn_within_days=2)</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="active" eval="True"/>
+            <field name="doall" eval="False"/>
+        </record>
+
+        <record id="cron_refresh_rapaport_prices" model="ir.cron">
+            <field name="name">Darakjian — Refresh Rapaport prices on gem cards</field>
+            <field name="model_id" ref="model_darakjian_gem_card"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_refresh_rapaport_prices()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="active" eval="True"/>
+            <field name="doall" eval="False"/>
+        </record>
+
+    </data>
+</odoo>

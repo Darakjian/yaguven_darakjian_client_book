@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             COMMISSION — Kanban board (grouped by state, for managers)
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="view_darakjian_commission_kanban" model="ir.ui.view">
+            <field name="name">darakjian.commission.kanban</field>
+            <field name="model">darakjian.commission</field>
+            <field name="arch" type="xml">
+                <kanban class="o_darakjian_post" default_group_by="state"
+                        default_order="date_calculated desc" sample="1">
+                    <field name="id"/>
+                    <field name="name"/>
+                    <field name="user_id"/>
+                    <field name="sale_order_id"/>
+                    <field name="base_amount"/>
+                    <field name="percentage"/>
+                    <field name="amount"/>
+                    <field name="currency_id"/>
+                    <field name="date_calculated"/>
+                    <field name="date_approved"/>
+                    <field name="date_paid"/>
+                    <field name="state"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="o_kanban_record o_darakjian_post_card">
+                                <div class="o_dk_post_title">
+                                    <i class="fa fa-money me-2"/>
+                                    <field name="name"/>
+                                </div>
+                                <div class="o_dk_post_subtitle">
+                                    <i class="fa fa-user-circle-o me-1"/>
+                                    <field name="user_id"/>
+                                </div>
+                                <div class="o_dk_post_body">
+                                    <strong>
+                                        <field name="amount" widget="monetary"/>
+                                    </strong>
+                                    <span class="text-muted">
+                                        (<field name="percentage"/>% of
+                                        <field name="base_amount" widget="monetary"/>)
+                                    </span>
+                                </div>
+                                <div class="o_dk_post_footer">
+                                    <span class="o_dk_post_meta">
+                                        <i class="fa fa-shopping-cart me-1"/>
+                                        <field name="sale_order_id"/>
+                                    </span>
+                                    <span class="o_dk_post_meta">
+                                        <i class="fa fa-calendar me-1"/>
+                                        <field name="date_calculated"/>
+                                    </span>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             COMMISSION — List
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="view_darakjian_commission_list" model="ir.ui.view">
+            <field name="name">darakjian.commission.list</field>
+            <field name="model">darakjian.commission</field>
+            <field name="arch" type="xml">
+                <list default_order="date_calculated desc"
+                      sample="1">
+                    <field name="name"/>
+                    <field name="date_calculated"/>
+                    <field name="sale_order_id"/>
+                    <field name="user_id"/>
+                    <field name="base_amount" widget="monetary" sum="Base total"/>
+                    <field name="percentage"/>
+                    <field name="amount" widget="monetary" sum="Commission total"/>
+                    <field name="currency_id" optional="hide"/>
+                    <field name="rule_id" optional="hide"/>
+                    <field name="state" decoration-info="state == 'calculated'"
+                                         decoration-warning="state == 'approved'"
+                                         decoration-success="state == 'paid'"
+                                         decoration-muted="state == 'cancelled'"/>
+                    <field name="date_approved" optional="hide"/>
+                    <field name="date_paid" optional="hide"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             COMMISSION — Form
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="view_darakjian_commission_form" model="ir.ui.view">
+            <field name="name">darakjian.commission.form</field>
+            <field name="model">darakjian.commission</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="action_approve" type="object"
+                                string="Approve"
+                                class="oe_highlight"
+                                invisible="state != 'calculated'"
+                                groups="yaguven_darakjian_client_book.group_darakjian_manager"/>
+                        <button name="action_recalculate" type="object"
+                                string="Recalculate"
+                                invisible="state != 'calculated'"
+                                groups="yaguven_darakjian_client_book.group_darakjian_manager"/>
+                        <button name="action_mark_paid" type="object"
+                                string="Mark paid"
+                                class="oe_highlight"
+                                invisible="state != 'approved'"
+                                groups="yaguven_darakjian_client_book.group_darakjian_admin"
+                                confirm="Mark this commission as paid? Date of payment will be set to today."/>
+                        <button name="action_cancel" type="object"
+                                string="Cancel"
+                                invisible="state in ('paid', 'cancelled')"
+                                groups="yaguven_darakjian_client_book.group_darakjian_manager"
+                                confirm="Cancel this commission?"/>
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="calculated,approved,paid"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group string="Pairing">
+                                <field name="sale_order_id"
+                                       options="{'no_create_edit': True}"
+                                       readonly="state != 'calculated'"/>
+                                <field name="user_id"
+                                       readonly="state != 'calculated'"/>
+                                <field name="rule_id"
+                                       options="{'no_create_edit': True}"
+                                       readonly="state != 'calculated'"/>
+                            </group>
+                            <group string="Calculation">
+                                <field name="base_amount" widget="monetary" readonly="1"/>
+                                <field name="percentage" readonly="state != 'calculated'"/>
+                                <field name="amount" widget="monetary" readonly="state != 'calculated'"/>
+                                <field name="currency_id" readonly="1"/>
+                            </group>
+                        </group>
+                        <group string="Timeline">
+                            <group>
+                                <field name="date_calculated" readonly="1"/>
+                                <field name="date_approved" readonly="1"/>
+                                <field name="date_paid" readonly="1"/>
+                            </group>
+                        </group>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             COMMISSION — Search
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="view_darakjian_commission_search" model="ir.ui.view">
+            <field name="name">darakjian.commission.search</field>
+            <field name="model">darakjian.commission</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <field name="sale_order_id"/>
+                    <field name="user_id"/>
+                    <filter name="filter_mine" string="Mine"
+                            domain="[('user_id', '=', uid)]"/>
+                    <filter name="filter_calculated" string="Calculated"
+                            domain="[('state', '=', 'calculated')]"/>
+                    <filter name="filter_approved" string="Approved"
+                            domain="[('state', '=', 'approved')]"/>
+                    <filter name="filter_paid" string="Paid"
+                            domain="[('state', '=', 'paid')]"/>
+                    <filter name="filter_cancelled" string="Cancelled"
+                            domain="[('state', '=', 'cancelled')]"/>
+                    <separator/>
+                    <filter name="filter_pending_review" string="Pending review"
+                            domain="[('state', 'in', ('calculated',))]"/>
+                    <filter name="filter_pending_payment" string="Pending payment"
+                            domain="[('state', '=', 'approved')]"/>
+                    <separator/>
+                    <filter name="filter_this_month" string="This month"
+                            domain="[('date_calculated', '&gt;=', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d')),
+                                     ('date_calculated', '&lt;', (context_today() + relativedelta(months=1, day=1)).strftime('%Y-%m-%d'))]"/>
+                    <filter name="filter_last_month" string="Last month"
+                            domain="[('date_calculated', '&gt;=', (context_today() + relativedelta(months=-1, day=1)).strftime('%Y-%m-%d')),
+                                     ('date_calculated', '&lt;', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d'))]"/>
+                    <group expand="0" string="Group by">
+                        <filter name="groupby_state" string="State"
+                                context="{'group_by': 'state'}"/>
+                        <filter name="groupby_user" string="Advisor"
+                                context="{'group_by': 'user_id'}"/>
+                        <filter name="groupby_calculated_month" string="Calculation month"
+                                context="{'group_by': 'date_calculated:month'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             COMMISSION — Window action + menu
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="action_darakjian_commission_mine" model="ir.actions.act_window">
+            <field name="name">My Commissions</field>
+            <field name="res_model">darakjian.commission</field>
+            <field name="view_mode">list,kanban,form</field>
+            <field name="search_view_id" ref="view_darakjian_commission_search"/>
+            <field name="context">{'search_default_filter_mine': 1}</field>
+            <field name="domain">[('user_id', '=', uid)]</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">No commissions yet.</p>
+                <p>Your commissions are calculated automatically when a sale order is confirmed, using the active commission rule.</p>
+            </field>
+        </record>
+
+        <record id="action_darakjian_commission_all" model="ir.actions.act_window">
+            <field name="name">Commissions</field>
+            <field name="res_model">darakjian.commission</field>
+            <field name="view_mode">kanban,list,form</field>
+            <field name="search_view_id" ref="view_darakjian_commission_search"/>
+            <field name="context">{'search_default_filter_pending_review': 1, 'search_default_filter_pending_payment': 1}</field>
+        </record>
+
+        <menuitem id="menu_darakjian_commission_mine"
+                  name="My Commissions"
+                  parent="menu_darakjian_process"
+                  action="action_darakjian_commission_mine"
+                  sequence="70"
+                  groups="group_darakjian_advisor"/>
+
+        <menuitem id="menu_darakjian_commission_all"
+                  name="Commissions"
+                  parent="menu_darakjian_admin_section"
+                  action="action_darakjian_commission_all"
+                  sequence="30"
+                  groups="group_darakjian_manager"/>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             COMMISSION RULE — List + Form + menu (Admin only)
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="view_darakjian_commission_rule_list" model="ir.ui.view">
+            <field name="name">darakjian.commission.rule.list</field>
+            <field name="model">darakjian.commission.rule</field>
+            <field name="arch" type="xml">
+                <list default_order="user_id, valid_from desc, id desc">
+                    <field name="name"/>
+                    <field name="user_id"/>
+                    <field name="percentage"/>
+                    <field name="min_margin" widget="monetary"/>
+                    <field name="currency_id" optional="hide"/>
+                    <field name="valid_from"/>
+                    <field name="valid_to" optional="show"/>
+                    <field name="active" widget="boolean_toggle"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_darakjian_commission_rule_form" model="ir.ui.view">
+            <field name="name">darakjian.commission.rule.form</field>
+            <field name="model">darakjian.commission.rule</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name"
+                                       placeholder="e.g. Senior advisor rule 2026"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group string="Scope">
+                                <field name="user_id"
+                                       options="{'no_create_edit': True}"/>
+                                <field name="active"/>
+                            </group>
+                            <group string="Calculation">
+                                <field name="percentage"/>
+                                <field name="min_margin" widget="monetary"/>
+                                <field name="currency_id"
+                                       options="{'no_create': True, 'no_open': True}"/>
+                            </group>
+                        </group>
+                        <group string="Validity">
+                            <group>
+                                <field name="valid_from"/>
+                                <field name="valid_to"
+                                       help="Leave empty if the rule is currently in force."/>
+                            </group>
+                        </group>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_darakjian_commission_rule_search" model="ir.ui.view">
+            <field name="name">darakjian.commission.rule.search</field>
+            <field name="model">darakjian.commission.rule</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <field name="user_id"/>
+                    <filter name="filter_active" string="Active"
+                            domain="[('active', '=', True)]"/>
+                    <filter name="filter_open" string="Currently in force"
+                            domain="[('active', '=', True), ('valid_to', '=', False)]"/>
+                    <filter name="filter_closed" string="Closed"
+                            domain="[('valid_to', '!=', False)]"/>
+                    <group expand="0" string="Group by">
+                        <filter name="groupby_user" string="Advisor"
+                                context="{'group_by': 'user_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_darakjian_commission_rule" model="ir.actions.act_window">
+            <field name="name">Commission Rules</field>
+            <field name="res_model">darakjian.commission.rule</field>
+            <field name="view_mode">list,form</field>
+            <field name="search_view_id" ref="view_darakjian_commission_rule_search"/>
+            <field name="context">{'search_default_filter_open': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">No commission rules yet.</p>
+                <p>Each advisor needs an open commission rule for commissions to be calculated on order confirmation.</p>
+            </field>
+        </record>
+
+        <menuitem id="menu_darakjian_commission_rule"
+                  name="Commission Rules"
+                  parent="menu_darakjian_admin_section"
+                  action="action_darakjian_commission_rule"
+                  sequence="40"
+                  groups="group_darakjian_admin"/>
+
+    </data>
+</odoo>

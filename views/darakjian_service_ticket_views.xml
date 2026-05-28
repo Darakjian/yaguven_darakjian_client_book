@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             KANBAN — Board view (grouped by state)
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="view_darakjian_service_ticket_kanban" model="ir.ui.view">
+            <field name="name">darakjian.service.ticket.kanban</field>
+            <field name="model">darakjian.service.ticket</field>
+            <field name="arch" type="xml">
+                <kanban class="o_darakjian_post" default_group_by="state"
+                        default_order="date_received desc" sample="1">
+                    <field name="id"/>
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="product_id"/>
+                    <field name="piece_description"/>
+                    <field name="kind"/>
+                    <field name="date_received"/>
+                    <field name="date_promised"/>
+                    <field name="date_delivered"/>
+                    <field name="state"/>
+                    <field name="custody_location"/>
+                    <field name="assigned_to"/>
+                    <field name="received_by"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="o_kanban_record o_darakjian_post_card">
+                                <div class="o_dk_post_title">
+                                    <i class="fa fa-wrench me-2"/>
+                                    <field name="name"/>
+                                </div>
+                                <div class="o_dk_post_subtitle">
+                                    <field name="partner_id"/>
+                                    · <field name="kind"/>
+                                </div>
+                                <div class="o_dk_post_body">
+                                    <strong><field name="piece_description"/></strong>
+                                    <div class="o_dk_post_meta" t-if="record.custody_location.raw_value">
+                                        <i class="fa fa-archive me-1"/>
+                                        <field name="custody_location"/>
+                                    </div>
+                                </div>
+                                <div class="o_dk_post_footer">
+                                    <span class="o_dk_post_meta">
+                                        <i class="fa fa-calendar me-1"/>
+                                        Received <field name="date_received"/>
+                                    </span>
+                                    <span t-if="record.date_promised.raw_value" class="o_dk_post_meta">
+                                        <i class="fa fa-clock-o me-1"/>
+                                        Promised <field name="date_promised"/>
+                                    </span>
+                                </div>
+                                <div class="o_dk_post_meta" t-if="record.assigned_to.raw_value">
+                                    <i class="fa fa-user-circle me-1"/>
+                                    <field name="assigned_to"/>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             FORM
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="view_darakjian_service_ticket_form" model="ir.ui.view">
+            <field name="name">darakjian.service.ticket.form</field>
+            <field name="model">darakjian.service.ticket</field>
+            <field name="arch" type="xml">
+                <form class="o_darakjian_post">
+                    <header>
+                        <button name="action_send_to_workshop" type="object"
+                                string="Send to workshop"
+                                class="oe_highlight"
+                                invisible="state != 'received'"/>
+                        <button name="action_mark_ready" type="object"
+                                string="Mark ready"
+                                class="oe_highlight"
+                                invisible="state not in ('received', 'in_workshop')"/>
+                        <button name="action_deliver" type="object"
+                                string="Deliver to client"
+                                class="oe_highlight"
+                                invisible="state != 'ready'"
+                                confirm="Confirm delivery? The piece leaves our custody."/>
+                        <button name="action_cancel" type="object"
+                                string="Cancel"
+                                invisible="state == 'delivered' or state == 'cancelled'"
+                                confirm="Cancel this ticket? Make sure the piece has been returned to the client."/>
+                        <button name="action_reopen" type="object"
+                                string="Reopen"
+                                invisible="state != 'cancelled'"/>
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="received,in_workshop,ready,delivered"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                            <div class="o_dk_post_subtitle">
+                                <field name="kind"
+                                       readonly="state in ('delivered', 'cancelled')"/>
+                            </div>
+                        </div>
+                        <group>
+                            <group string="Client and piece">
+                                <field name="partner_id"
+                                       options="{'no_create_edit': True}"
+                                       readonly="state in ('delivered', 'cancelled')"/>
+                                <field name="product_id"
+                                       options="{'no_create_edit': True}"
+                                       readonly="state in ('delivered', 'cancelled')"/>
+                                <field name="piece_description"
+                                       readonly="state in ('delivered', 'cancelled')"
+                                       placeholder="Vintage gold ring, ~5g, single round diamond..."/>
+                            </group>
+                            <group string="Schedule">
+                                <field name="date_received"
+                                       readonly="state in ('delivered', 'cancelled')"/>
+                                <field name="date_promised"
+                                       readonly="state in ('delivered', 'cancelled')"/>
+                                <field name="date_delivered" readonly="1"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group string="Custody">
+                                <field name="custody_location"
+                                       readonly="state in ('delivered', 'cancelled')"
+                                       placeholder="Safe A, drawer 3"/>
+                            </group>
+                            <group string="Staff">
+                                <field name="received_by"/>
+                                <field name="assigned_to"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Request" name="request">
+                                <field name="description" nolabel="1"
+                                       readonly="state in ('delivered', 'cancelled')"
+                                       placeholder="What the client requested..."/>
+                            </page>
+                            <page string="Custody evidence" name="custody">
+                                <field name="custody_attachment_ids"
+                                       widget="many2many_binary"
+                                       readonly="state in ('delivered', 'cancelled')"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             LIST
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="view_darakjian_service_ticket_list" model="ir.ui.view">
+            <field name="name">darakjian.service.ticket.list</field>
+            <field name="model">darakjian.service.ticket</field>
+            <field name="arch" type="xml">
+                <list default_order="date_received desc">
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="piece_description"/>
+                    <field name="kind"/>
+                    <field name="date_received"/>
+                    <field name="date_promised" optional="show"/>
+                    <field name="date_delivered" optional="hide"/>
+                    <field name="state" decoration-info="state == 'received'"
+                                         decoration-warning="state == 'in_workshop'"
+                                         decoration-success="state == 'ready'"
+                                         decoration-muted="state in ('delivered', 'cancelled')"/>
+                    <field name="assigned_to" optional="show"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             SEARCH
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="view_darakjian_service_ticket_search" model="ir.ui.view">
+            <field name="name">darakjian.service.ticket.search</field>
+            <field name="model">darakjian.service.ticket</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="piece_description"/>
+                    <field name="product_id"/>
+                    <field name="assigned_to"/>
+                    <field name="received_by"/>
+                    <filter name="filter_mine_received" string="I received"
+                            domain="[('received_by', '=', uid)]"/>
+                    <filter name="filter_mine_assigned" string="Assigned to me"
+                            domain="[('assigned_to', '=', uid)]"/>
+                    <separator/>
+                    <filter name="filter_received" string="Received"
+                            domain="[('state', '=', 'received')]"/>
+                    <filter name="filter_in_workshop" string="In workshop"
+                            domain="[('state', '=', 'in_workshop')]"/>
+                    <filter name="filter_ready" string="Ready"
+                            domain="[('state', '=', 'ready')]"/>
+                    <filter name="filter_delivered" string="Delivered"
+                            domain="[('state', '=', 'delivered')]"/>
+                    <filter name="filter_cancelled" string="Cancelled"
+                            domain="[('state', '=', 'cancelled')]"/>
+                    <separator/>
+                    <filter name="filter_overdue" string="Overdue"
+                            domain="[('state', 'in', ('received', 'in_workshop')),
+                                     ('date_promised', '!=', False),
+                                     ('date_promised', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                    <filter name="filter_reparation" string="Reparation"
+                            domain="[('kind', '=', 'reparation')]"/>
+                    <filter name="filter_appraisal" string="Appraisal"
+                            domain="[('kind', '=', 'appraisal')]"/>
+                    <filter name="filter_custody" string="Custody only"
+                            domain="[('kind', '=', 'custody')]"/>
+                    <group expand="0" string="Group by">
+                        <filter name="groupby_state" string="State"
+                                context="{'group_by': 'state'}"/>
+                        <filter name="groupby_kind" string="Kind"
+                                context="{'group_by': 'kind'}"/>
+                        <filter name="groupby_assigned" string="Assigned to"
+                                context="{'group_by': 'assigned_to'}"/>
+                        <filter name="groupby_partner" string="Client"
+                                context="{'group_by': 'partner_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             WINDOW ACTION + MENU ITEM
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="action_darakjian_service_ticket" model="ir.actions.act_window">
+            <field name="name">Service Tickets</field>
+            <field name="res_model">darakjian.service.ticket</field>
+            <field name="view_mode">kanban,list,form</field>
+            <field name="search_view_id" ref="view_darakjian_service_ticket_search"/>
+            <field name="context">{'search_default_filter_received': 1, 'search_default_filter_in_workshop': 1, 'search_default_filter_ready': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">No service tickets yet.</p>
+                <p>Track every piece in our custody — reparations, appraisals, custom alterations or temporary safekeeping — with audit-grade evidence.</p>
+            </field>
+        </record>
+
+        <menuitem id="menu_darakjian_service_ticket"
+                  name="Service Tickets"
+                  parent="menu_darakjian_process"
+                  action="action_darakjian_service_ticket"
+                  sequence="60"
+                  groups="group_darakjian_advisor"/>
+
+    </data>
+</odoo>

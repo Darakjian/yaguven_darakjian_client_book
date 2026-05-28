@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             KANBAN — Editorial feed of appointments (tablet "post" style)
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="view_darakjian_appointment_kanban" model="ir.ui.view">
+            <field name="name">darakjian.appointment.kanban</field>
+            <field name="model">darakjian.appointment</field>
+            <field name="arch" type="xml">
+                <kanban class="o_darakjian_post" default_order="datetime_start desc" sample="1">
+                    <field name="id"/>
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="salesperson_id"/>
+                    <field name="datetime_start"/>
+                    <field name="datetime_end"/>
+                    <field name="state"/>
+                    <field name="kind"/>
+                    <field name="wishlist_id"/>
+                    <field name="hold_ids"/>
+                    <field name="notes_internal"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="o_kanban_record o_darakjian_post_card">
+                                <div class="o_dk_post_title">
+                                    <field name="partner_id"/>
+                                </div>
+                                <div class="o_dk_post_subtitle">
+                                    <field name="kind"/>
+                                    · <field name="datetime_start"/>
+                                </div>
+                                <div class="o_dk_post_body">
+                                    <t t-if="record.notes_internal.raw_value">
+                                        <field name="notes_internal" widget="text"/>
+                                    </t>
+                                    <t t-if="!record.notes_internal.raw_value">
+                                        <span class="text-muted">No internal notes yet.</span>
+                                    </t>
+                                </div>
+                                <div class="o_dk_post_footer">
+                                    <span t-attf-class="o_dk_pill o_dk_pill_#{record.state.raw_value}">
+                                        <field name="state"/>
+                                    </span>
+                                    <span class="o_dk_post_meta">
+                                        <i class="fa fa-user-circle-o me-1"/>
+                                        <field name="salesperson_id"/>
+                                    </span>
+                                </div>
+                                <div class="o_dk_post_meta" t-if="record.wishlist_id.raw_value or record.hold_ids.raw_value">
+                                    <span t-if="record.wishlist_id.raw_value">
+                                        <i class="fa fa-bookmark-o me-1"/>
+                                        <field name="wishlist_id"/>
+                                    </span>
+                                    <span t-if="record.hold_ids.raw_value">
+                                        <i class="fa fa-lock me-1"/>
+                                        <t t-esc="record.hold_ids.raw_value.length"/> hold(s)
+                                    </span>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             FORM — Editorial detail view (tablet "post" style)
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="view_darakjian_appointment_form" model="ir.ui.view">
+            <field name="name">darakjian.appointment.form</field>
+            <field name="model">darakjian.appointment</field>
+            <field name="arch" type="xml">
+                <form class="o_darakjian_post">
+                    <header>
+                        <button name="action_confirm" type="object"
+                                string="Confirm"
+                                class="oe_highlight"
+                                invisible="state != 'draft'"/>
+                        <button name="action_mark_done" type="object"
+                                string="Mark done"
+                                class="oe_highlight"
+                                invisible="state != 'confirmed'"/>
+                        <button name="action_mark_no_show" type="object"
+                                string="No show"
+                                invisible="state != 'confirmed'"/>
+                        <button name="action_cancel" type="object"
+                                string="Cancel"
+                                invisible="state in ('cancelled', 'done')"/>
+                        <button name="action_reset_to_draft" type="object"
+                                string="Reset to draft"
+                                invisible="state == 'draft'"/>
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="draft,confirmed,done"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                            <div class="o_dk_post_subtitle">
+                                <field name="kind" readonly="state != 'draft'"/>
+                            </div>
+                        </div>
+                        <group>
+                            <group string="Client and advisor">
+                                <field name="partner_id"
+                                       options="{'no_create_edit': True}"
+                                       readonly="state in ('done', 'cancelled')"/>
+                                <field name="salesperson_id"
+                                       readonly="state in ('done', 'cancelled')"/>
+                            </group>
+                            <group string="Schedule">
+                                <field name="datetime_start"
+                                       readonly="state in ('done', 'cancelled')"/>
+                                <field name="datetime_end"
+                                       readonly="state in ('done', 'cancelled')"/>
+                                <field name="event_id" readonly="1"/>
+                            </group>
+                        </group>
+                        <group string="Prepared selection">
+                            <field name="wishlist_id"
+                                   readonly="state in ('done', 'cancelled')"/>
+                            <field name="hold_ids" widget="many2many_tags"
+                                   readonly="state in ('done', 'cancelled')"/>
+                        </group>
+                        <group string="Internal notes">
+                            <field name="notes_internal" nolabel="1"
+                                   placeholder="What the client values, anniversaries, conversation hooks..."/>
+                        </group>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             LIST — Fallback table for managers and bulk operations
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="view_darakjian_appointment_list" model="ir.ui.view">
+            <field name="name">darakjian.appointment.list</field>
+            <field name="model">darakjian.appointment</field>
+            <field name="arch" type="xml">
+                <list default_order="datetime_start desc">
+                    <field name="name"/>
+                    <field name="datetime_start"/>
+                    <field name="partner_id"/>
+                    <field name="salesperson_id"/>
+                    <field name="kind"/>
+                    <field name="state" decoration-success="state == 'done'"
+                                         decoration-info="state == 'confirmed'"
+                                         decoration-warning="state == 'no_show'"
+                                         decoration-muted="state in ('cancelled', 'draft')"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             SEARCH — Filters tuned to the advisor workflow
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="view_darakjian_appointment_search" model="ir.ui.view">
+            <field name="name">darakjian.appointment.search</field>
+            <field name="model">darakjian.appointment</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="salesperson_id"/>
+                    <field name="wishlist_id"/>
+                    <filter name="filter_mine" string="My appointments"
+                            domain="[('salesperson_id', '=', uid)]"/>
+                    <filter name="filter_today" string="Today"
+                            domain="[('datetime_start', '&gt;=', context_today().strftime('%Y-%m-%d 00:00:00')),
+                                     ('datetime_start', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d 00:00:00'))]"/>
+                    <filter name="filter_this_week" string="This week"
+                            domain="[('datetime_start', '&gt;=', (context_today() + relativedelta(weeks=-context_today().weekday() // 7, days=-context_today().weekday())).strftime('%Y-%m-%d 00:00:00')),
+                                     ('datetime_start', '&lt;', (context_today() + relativedelta(days=7-context_today().weekday())).strftime('%Y-%m-%d 00:00:00'))]"/>
+                    <filter name="filter_upcoming" string="Upcoming"
+                            domain="[('datetime_start', '&gt;=', datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))]"/>
+                    <separator/>
+                    <filter name="filter_draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                    <filter name="filter_confirmed" string="Confirmed" domain="[('state', '=', 'confirmed')]"/>
+                    <filter name="filter_done" string="Done" domain="[('state', '=', 'done')]"/>
+                    <filter name="filter_no_show" string="No show" domain="[('state', '=', 'no_show')]"/>
+                    <filter name="filter_cancelled" string="Cancelled" domain="[('state', '=', 'cancelled')]"/>
+                    <separator/>
+                    <filter name="filter_walk_in" string="Walk-in" domain="[('kind', '=', 'walk_in')]"/>
+                    <filter name="filter_scheduled" string="Scheduled" domain="[('kind', '=', 'scheduled')]"/>
+                    <filter name="filter_bridal" string="Bridal consult" domain="[('kind', '=', 'bridal_consult')]"/>
+                    <filter name="filter_watch" string="Watch" domain="[('kind', '=', 'watch_appointment')]"/>
+                    <group expand="0" string="Group by">
+                        <filter name="groupby_salesperson" string="Advisor"
+                                context="{'group_by': 'salesperson_id'}"/>
+                        <filter name="groupby_partner" string="Client"
+                                context="{'group_by': 'partner_id'}"/>
+                        <filter name="groupby_state" string="State"
+                                context="{'group_by': 'state'}"/>
+                        <filter name="groupby_kind" string="Type"
+                                context="{'group_by': 'kind'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             WINDOW ACTION + MENU ITEM
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="action_darakjian_appointment" model="ir.actions.act_window">
+            <field name="name">Appointments</field>
+            <field name="res_model">darakjian.appointment</field>
+            <field name="view_mode">kanban,list,form</field>
+            <field name="search_view_id" ref="view_darakjian_appointment_search"/>
+            <field name="context">{'search_default_filter_mine': 1, 'search_default_filter_upcoming': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">No appointments yet.</p>
+                <p>Schedule a client visit and prepare a selection of pieces in advance.</p>
+            </field>
+        </record>
+
+        <menuitem id="menu_darakjian_appointment"
+                  name="Appointments"
+                  parent="menu_darakjian_process"
+                  action="action_darakjian_appointment"
+                  sequence="10"
+                  groups="group_darakjian_advisor"/>
+
+    </data>
+</odoo>
