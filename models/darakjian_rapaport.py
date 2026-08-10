@@ -7,7 +7,7 @@ class DarakjianRapaportQuote(models.Model):
 
     Holds per-band quotes (carat range × color × clarity) and exposes a
     lookup with the public method `_get_price_per_carat`. Source is either
-    `mock` (loaded from data/rapaport_mock_data.xml) or `live` (Etapa 3,
+    `mock` (loaded from data/rapaport_mock_data.xml) or `live` (Phase 3,
     when Darakjian provides Rapaport API credentials). Call sites do not
     change between mock and live — only the `source` argument or the set
     of active records change.
@@ -80,7 +80,7 @@ class DarakjianRapaportQuote(models.Model):
         tracking=True,
         help='Mock quotes are loaded from module data for development and '
              'showroom training. Live quotes will be populated by the '
-             'Rapaport API connector in Etapa 3.',
+             'Rapaport API connector in Phase 3.',
     )
     valid_from = fields.Date(
         required=True,
@@ -209,13 +209,13 @@ class DarakjianRapaportQuote(models.Model):
     # ────────────────────────────────────────────────────────────────────
     @api.model
     def _load_mock_matrix(self):
-        """Load the mock Rapaport matrix used in Etapa 1.
+        """Load the mock Rapaport matrix used in Phase 1.
 
         Idempotent: skips combinations already present for the same source
         and valid_from. Safe to invoke multiple times. Prices follow a
         plausible 2026-USD baseline scaled by color and clarity factors.
 
-        Replace by the live Rapaport connector in Etapa 3 — call sites
+        Replace by the live Rapaport connector in Phase 3 — call sites
         keep using `_get_price_per_carat(...)`, no other code changes.
         """
         bands = [

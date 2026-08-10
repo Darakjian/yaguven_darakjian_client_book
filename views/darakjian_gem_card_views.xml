@@ -345,7 +345,7 @@
             <field name="context">{'search_default_filter_current': 1}</field>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">No Rapaport quotes loaded.</p>
-                <p>The mock matrix is loaded automatically on install. In Etapa 3 the live API connector will populate quotes with source=live.</p>
+                <p>The mock matrix is loaded automatically on install. In Phase 3 the live API connector will populate quotes with source=live.</p>
             </field>
         </record>
 

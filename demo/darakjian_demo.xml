@@ -7,8 +7,8 @@
              ════════════════════════════════════════════════════════════════ -->
 
         <record id="demo_partner_romero" model="res.partner">
-            <field name="name">Mariana Romero</field>
-            <field name="email">mariana.romero@example.com</field>
+            <field name="name">Margaret Whitfield</field>
+            <field name="email">margaret.whitfield@example.com</field>
             <field name="phone">+1 248 555 0142</field>
             <field name="is_company" eval="False"/>
             <field name="street">123 Main St</field>
@@ -19,30 +19,30 @@
         </record>
 
         <record id="demo_partner_romero_spouse" model="res.partner">
-            <field name="name">Diego Romero</field>
-            <field name="email">diego.romero@example.com</field>
+            <field name="name">David Whitfield</field>
+            <field name="email">david.whitfield@example.com</field>
             <field name="phone">+1 248 555 0143</field>
             <field name="is_company" eval="False"/>
             <field name="parent_id" ref="demo_partner_romero"/>
         </record>
 
         <record id="demo_partner_sosa" model="res.partner">
-            <field name="name">Patricia Sosa</field>
-            <field name="email">patricia.sosa@example.com</field>
+            <field name="name">Patricia Sullivan</field>
+            <field name="email">patricia.sullivan@example.com</field>
             <field name="phone">+1 248 555 0188</field>
             <field name="is_company" eval="False"/>
         </record>
 
         <record id="demo_partner_mendieta" model="res.partner">
-            <field name="name">Lorenzo Mendieta</field>
-            <field name="email">lorenzo.mendieta@example.com</field>
+            <field name="name">Lawrence Mitchell</field>
+            <field name="email">lawrence.mitchell@example.com</field>
             <field name="phone">+1 248 555 0211</field>
             <field name="is_company" eval="False"/>
         </record>
 
         <record id="demo_partner_cordero" model="res.partner">
-            <field name="name">Esteban Cordero</field>
-            <field name="email">esteban.cordero@example.com</field>
+            <field name="name">Steven Coleman</field>
+            <field name="email">steven.coleman@example.com</field>
             <field name="phone">+1 248 555 0277</field>
             <field name="is_company" eval="False"/>
         </record>
@@ -52,7 +52,7 @@
              ════════════════════════════════════════════════════════════════ -->
 
         <record id="demo_family_romero" model="darakjian.family">
-            <field name="name">The Romero family</field>
+            <field name="name">The Whitfield family</field>
             <field name="notes">&lt;p&gt;Long-time clients of the showroom. Two anniversaries celebrated with us so far.&lt;/p&gt;</field>
         </record>
 

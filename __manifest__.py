@@ -1,29 +1,29 @@
 {
     'name': 'Darakjian — Client Book',
-    'summary': 'Acompañamiento al proceso de venta en showroom (Etapa 1: base del recorrido).',
+    'summary': 'Support for the showroom selling process (Phase 1: the customer journey).',
     'description': """
-Módulo de acompañamiento al proceso de venta para Darakjian Jewelers.
+Showroom selling support for Darakjian Jewelers.
 
-Etapa 1 — Base del recorrido. Provee:
+Phase 1 — The customer journey. Provides:
 
-- Client book 360° del cliente final.
-- Familia cliente como entidad de primera clase.
-- Asesor titular asignado a cada partner.
-- Wishlist sincronizada sitio–showroom.
-- Holds y reservas de pieza con expiración configurable.
-- Agenda de cita integrada al calendario del asesor.
-- Ficha de pieza enriquecida (4Cs, fotos, video, certificación cargada).
-- Workflow de servicios in-house (reparación, valuación, custodia trazable).
-- Atribución y comisión automática al asesor.
+- A 360° client book for the end customer.
+- The client family as a first-class entity.
+- A lead advisor assigned to each contact.
+- A wishlist kept in sync between the website and the showroom.
+- Holds and piece reservations with a configurable expiry.
+- Appointment scheduling on the advisor's own calendar.
+- An enriched piece record (4Cs, photos, video, uploaded certification).
+- An in-house service workflow (repair, appraisal, traceable custody).
+- Automatic attribution and commission for the advisor.
 
-Diseño: datos en tablas propias del módulo con clave foránea a los nativos.
-Sin campos almacenados sobre `res.partner`, `product.template` o `sale.order`.
-Sin dependencias a OCA, ADHOC ni a otros módulos de terceros.
+Design: data lives in the module's own tables, keyed to the native ones. No stored fields
+are added to `res.partner`, `product.template` or `sale.order`. No dependencies on OCA,
+ADHOC or any other third-party module.
 """,
     'author': 'Yagüven C.G.',
     'maintainer': 'Yagüven C.G.',
     'category': 'Sales/CRM',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.1.0',
     'license': 'LGPL-3',
     'depends': [
         'base',

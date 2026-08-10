@@ -3,11 +3,11 @@
     <data noupdate="1">
 
         <!-- ════════════════════════════════════════════════════════════════
-             Mock Rapaport matrix used in Etapa 1 for development and
+             Mock Rapaport matrix used in Phase 1 for development and
              showroom training. The function is idempotent: if rows for
              the same band/color/clarity/source/valid_from already exist,
              they are skipped. Replaced by the live Rapaport API connector
-             in Etapa 3 — gem cards keep using `_get_price_per_carat()`.
+             in Phase 3 — gem cards keep using `_get_price_per_carat()`.
              ════════════════════════════════════════════════════════════════ -->
 
         <function model="darakjian.rapaport.quote"

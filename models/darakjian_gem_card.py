@@ -106,7 +106,7 @@ class DarakjianGemCard(models.Model):
     internal_notes = fields.Html()
 
     # ────────────────────────────────────────────────────────────────────
-    # RAPAPORT REFERENCE PRICE (stub — replaced by live API in Etapa 3)
+    # RAPAPORT REFERENCE PRICE (stub — replaced by live API in Phase 3)
     # ────────────────────────────────────────────────────────────────────
     rapaport_source = fields.Selection(
         [
@@ -117,7 +117,7 @@ class DarakjianGemCard(models.Model):
         required=True,
         tracking=True,
         help='Source for the Rapaport reference price. Live becomes '
-             'available in Etapa 3 once Darakjian provides API credentials.',
+             'available in Phase 3 once Darakjian provides API credentials.',
     )
     rapaport_quote_id = fields.Many2one(
         'darakjian.rapaport.quote',
