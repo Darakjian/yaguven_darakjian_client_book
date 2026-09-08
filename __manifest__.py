@@ -22,6 +22,7 @@ ADHOC or any other third-party module.
 """,
     'author': 'Yagüven C.G.',
     'maintainer': 'Yagüven C.G.',
+    'website': 'https://github.com/Darakjian/yaguven_darakjian_client_book',
     'category': 'Sales/CRM',
     'version': '19.0.1.1.0',
     'license': 'LGPL-3',
